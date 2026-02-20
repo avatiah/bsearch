@@ -3,148 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STAGING: THREAT ENGINE ADMIN</title>
+    <title>SYSTEM: BURIAL SEARCH ENGINE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Дизайн согласно вашим инструкциям: черный фон, моноширинный шрифт, зеленый акцент */
-        body { 
-            background-color: #0a0a0a; 
-            color: #00ff41; 
-            font-family: 'Courier New', Courier, monospace; 
-            padding: 30px; 
-            margin: 0; 
-        }
-        .container { 
-            max-width: 1200px; 
-            margin: auto; 
-            border: 1px solid #00ff41; 
-            padding: 25px; 
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1); 
-        }
-        h2 { 
-            border-bottom: 2px solid #00ff41; 
-            padding-bottom: 10px; 
-            text-transform: uppercase; 
-            margin-top: 0; 
-            letter-spacing: 3px;
-        }
-        .status-bar {
-            background: #001100;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-left: 5px solid #00ff41;
-            font-size: 0.85em;
-        }
-        .search-box { 
-            display: flex; 
-            gap: 15px; 
-            margin-bottom: 30px; 
-        }
-        input { 
-            flex-grow: 1; 
-            background: #000; 
-            border: 1px solid #00ff41; 
-            color: #00ff41; 
-            padding: 15px; 
-            font-family: inherit; 
-            font-size: 18px; 
-            outline: none; 
-        }
-        input:focus { box-shadow: 0 0 10px #00ff41; }
-        button { 
-            background: #00ff41; 
-            color: #000; 
-            border: none; 
-            padding: 10px 30px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-family: inherit; 
-            text-transform: uppercase;
-            transition: 0.3s;
-        }
-        button:hover { background: #00cc33; transform: scale(1.05); }
-        
-        /* Прямые границы таблицы согласно инструкции */
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            border: 1px solid #00ff41; 
-        }
-        th, td { 
-            border: 1px solid #00ff41; 
-            padding: 12px; 
-            text-align: left; 
-        }
-        th { 
-            background: #002200; 
-            color: #00ff41;
-            text-transform: uppercase;
-            font-size: 0.9em;
-        }
-        tr:hover { background: #001100; }
-        
-        .map-link { 
-            color: #00ff41; 
-            text-decoration: underline; 
-            font-weight: bold; 
-        }
-        .no-data { color: #555; }
+        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; line-height: 1.4; }
+        .container { max-width: 1200px; margin: auto; border: 1px solid #00ff41; padding: 20px; box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); }
+        h2 { border-bottom: 1px solid #00ff41; padding-bottom: 10px; margin-top: 0; letter-spacing: 2px; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 12px; font-family: inherit; font-size: 16px; outline: none; }
+        button { background: #00ff41; color: #000; border: none; padding: 10px 25px; cursor: pointer; font-weight: bold; font-family: inherit; }
+        button:hover { background: #00cc33; }
+        .table-res { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; border: 1px solid #00ff41; }
+        th, td { border: 1px solid #00ff41; padding: 12px; text-align: left; font-size: 14px; }
+        th { background: #003300; text-transform: uppercase; }
+        .map-link { color: #00ff41; text-decoration: underline; font-weight: bold; }
+        #status { margin-bottom: 10px; font-size: 0.9em; height: 1.5em; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>[STAGING_ENVIRONMENT] BURIAL_SEARCH_v2.1</h2>
+    <h2>SYSTEM: BURIAL SEARCH ENGINE</h2>
+    <div id="status">READY...</div>
     
-    <div class="status-bar" id="status">
-        SYSTEM_STATUS: ACTIVE // WAITING_FOR_ENCRYPTED_QUERY...
-    </div>
-
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="ENTER NAME (E.G. ГЕРМАНСКИЙ)..." autocomplete="off">
-        <button onclick="executeSearch()">EXECUTE</button>
+        <input type="text" id="searchInput" placeholder="ВВЕДИТЕ ФАМИЛИЮ (НАПР. ГЕРМАНСКИЙ)..." autocomplete="off">
+        <button onclick="search()">EXECUTE</button>
     </div>
     
-    <table>
-        <thead>
-            <tr>
-                <th>ФИО</th>
-                <th>ДАТА РОЖД.</th>
-                <th>ДАТА СМЕРТИ</th>
-                <th>№ МОГИЛЫ</th>
-                <th>СЕКТОР</th>
-                <th>ГЕОДАННЫЕ</th>
-            </tr>
-        </thead>
-        <tbody id="resultsBody">
-            </tbody>
-    </table>
+    <div class="table-res">
+        <table>
+            <thead>
+                <tr>
+                    <th>ФИО</th>
+                    <th>ДАТА РОЖД.</th>
+                    <th>ДАТА СМЕРТИ</th>
+                    <th>№ МОГИЛЫ</th>
+                    <th>СЕКТОР</th>
+                    <th>КАРТА</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+        </table>
+    </div>
 </div>
 
 <script>
-    // Инициализация из ваших настроек
+    // Конфигурация из ваших настроек
     const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co';
-    // Вставьте ваш длинный ключ sb_publishable... вместо этого текста
-    const SUPABASE_KEY = 'ВАШ_ПОЛНЫЙ_PUBLISHABLE_KEY_ОТСЮДА_IMAGE_E10CC0'; 
+    const SUPABASE_KEY = 'sb_publishable_SHiQs5LAw5FbDQpu6N3b1Q_bM_Ms1DI';
     
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    async function executeSearch() {
+    async function search() {
         const query = document.getElementById('searchInput').value.trim();
         const status = document.getElementById('status');
         const tbody = document.getElementById('resultsBody');
         
         if (!query) {
-            status.innerText = 'WARNING: NULL_QUERY_DETECTED';
+            status.innerText = 'WARNING: EMPTY_QUERY';
             return;
         }
 
-        status.innerText = 'STATUS: CONNECTING_TO_DATABASE... SENDING_SECURE_REQUEST...';
+        status.innerText = 'EXECUTING_SECURE_SEARCH...';
         tbody.innerHTML = '';
 
         try {
-            // Используем .ilike для поиска без учета регистра по латинской колонке
-            // Современный клиент Supabase v2 сам кодирует кириллицу, исправляя ошибку Headers
+            // Профессиональный подход: поиск через ilike по full_name
+            // Библиотека v2 автоматически кодирует кириллицу для предотвращения ошибок Headers
             const { data, error } = await _supabase
                 .from('burials')
                 .select('*')
@@ -153,39 +80,36 @@
             if (error) throw error;
 
             if (!data || data.length === 0) {
-                status.innerText = 'STATUS: 0_RECORDS_FOUND. ACCESS_DENIED_OR_NO_DATA.';
+                status.innerText = 'RESULT: NOT_FOUND';
                 return;
             }
 
-            status.innerText = `STATUS: SUCCESS. ${data.length} RECORDS_DECRYPTED.`;
+            status.innerText = `SUCCESS. RECORDS_FOUND: ${data.length}`;
 
             data.forEach(item => {
-                // Логика формирования ссылки на карту
-                let geoOutput = '<span class="no-data">NO_COORDS</span>';
-                if (item.latitude && item.longitude && item.latitude !== 'NULL') {
-                    const mapUrl = `https://www.google.com/maps?q=${item.latitude},${item.longitude}`;
-                    geoOutput = `<a href="${mapUrl}" target="_blank" class="map-link">VIEW_MAP</a>`;
-                }
+                // Генерация ссылки на карту по координатам
+                const mapCell = (item.latitude && item.longitude && item.latitude !== 'NULL') 
+                    ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="map-link">VIEW</a>`
+                    : '-';
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${item.full_name || '-'}</td>
-                        <td>${item.birth_date || '-'}</td>
-                        <td>${item.death_date || '-'}</td>
-                        <td>${item.grave_number || '-'}</td>
-                        <td>${item.sector || '-'}</td>
-                        <td>${geoOutput}</td>
-                    </tr>`;
+                tbody.innerHTML += `<tr>
+                    <td>${item.full_name || '-'}</td>
+                    <td>${item.birth_date || '-'}</td>
+                    <td>${item.death_date || '-'}</td>
+                    <td>${item.grave_number || '-'}</td>
+                    <td>${item.sector || '-'}</td>
+                    <td>${mapCell}</td>
+                </tr>`;
             });
         } catch (err) {
-            status.innerText = 'CRITICAL_ERROR: ' + err.message.toUpperCase();
-            console.error('System Failure:', err);
+            console.error(err);
+            status.innerText = 'SYSTEM_ERROR: ' + err.message;
         }
     }
 
-    // Обработка нажатия ENTER
+    // Слушатель Enter
     document.getElementById('searchInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') executeSearch();
+        if (e.key === 'Enter') search();
     });
 </script>
 
