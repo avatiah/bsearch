@@ -6,150 +6,112 @@
     <title>SYSTEM: BURIAL SEARCH ENGINE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { 
-            background-color: #0a0a0a; 
-            color: #00ff41; 
-            font-family: 'Courier New', Courier, monospace; 
-            padding: 20px; 
-            margin: 0; 
-        }
-        .container { 
-            max-width: 1200px; 
-            margin: auto; 
-            border: 1px solid #00ff41; 
-            padding: 20px; 
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); 
-        }
-        h2 { 
-            border-bottom: 1px solid #00ff41; 
-            padding-bottom: 10px; 
-            text-transform: uppercase; 
-            margin-top: 0; 
-            letter-spacing: 2px;
-        }
-        .search-box { 
-            display: flex; 
-            gap: 10px; 
-            margin-bottom: 20px; 
-        }
-        input { 
-            flex-grow: 1; 
-            background: #000; 
-            border: 1px solid #00ff41; 
-            color: #00ff41; 
-            padding: 12px; 
-            font-family: inherit; 
-            font-size: 16px; 
-            outline: none; 
-        }
-        button { 
-            background: #00ff41; 
-            color: #000; 
-            border: none; 
-            padding: 10px 25px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-family: inherit; 
-            text-transform: uppercase;
-        }
-        button:hover { background: #008f11; }
+        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; line-height: 1.4; }
+        .container { max-width: 1200px; margin: auto; border: 1px solid #00ff41; padding: 20px; box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); }
+        h2 { border-bottom: 1px solid #00ff41; padding-bottom: 10px; margin-top: 0; letter-spacing: 2px; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 12px; font-family: inherit; font-size: 16px; outline: none; }
+        button { background: #00ff41; color: #000; border: none; padding: 10px 25px; cursor: pointer; font-weight: bold; font-family: inherit; }
+        button:hover { background: #00cc33; }
         .table-res { overflow-x: auto; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; border: 1px solid #00ff41; }
         th, td { border: 1px solid #00ff41; padding: 12px; text-align: left; font-size: 14px; }
         th { background: #003300; text-transform: uppercase; }
-        .geo-link { color: #00ff41; text-decoration: underline; font-weight: bold; }
-        #status { margin-bottom: 15px; font-size: 0.9em; min-height: 1.2em; color: #00ff41; }
+        .map-link { color: #00ff41; text-decoration: underline; font-weight: bold; }
+        #status { margin-bottom: 10px; font-size: 0.9em; height: 1.5em; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>System: Burial Search Engine</h2>
-        <div id="status">READY_FOR_INPUT...</div>
-        
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="ВВЕДИТЕ ФАМИЛИЮ (НАПР. ГЕРМАНСКИЙ)..." autocomplete="off">
-            <button onclick="search()">EXECUTE</button>
-        </div>
-        
-        <div class="table-res">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ФИО</th>
-                        <th>ДАТА РОЖДЕНИЯ</th>
-                        <th>ДАТА СМЕРТИ</th>
-                        <th>№ МОГИЛЫ</th>
-                        <th>СЕКТОР</th>
-                        <th>КАРТА</th>
-                    </tr>
-                </thead>
-                <tbody id="resultsBody"></tbody>
-            </table>
-        </div>
+
+<div class="container">
+    <h2>SYSTEM: BURIAL SEARCH ENGINE</h2>
+    <div id="status">READY...</div>
+    
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="ВВЕДИТЕ ФАМИЛИЮ (НАПР. ГЕРМАНСКИЙ)..." autocomplete="off">
+        <button onclick="search()">EXECUTE</button>
     </div>
+    
+    <div class="table-res">
+        <table>
+            <thead>
+                <tr>
+                    <th>ФИО</th>
+                    <th>ДАТА РОЖД.</th>
+                    <th>ДАТА СМЕРТИ</th>
+                    <th>№ МОГИЛЫ</th>
+                    <th>СЕКТОР</th>
+                    <th>КАРТА</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+        </table>
+    </div>
+</div>
 
-    <script>
-        // Инициализация
-        const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_SHiQs5LAw5FbDQpu6N3b1Q_bM_Ms1DI'; 
+<script>
+    // Конфигурация из ваших настроек
+    const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co';
+    const SUPABASE_KEY = 'ВАШ_ПОЛНЫЙ_PUBLISHABLE_KEY_ИЗ_IMAGE_E10CC0';
+    
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function search() {
+        const query = document.getElementById('searchInput').value.trim();
+        const status = document.getElementById('status');
+        const tbody = document.getElementById('resultsBody');
         
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        if (!query) {
+            status.innerText = 'WARNING: EMPTY_QUERY';
+            return;
+        }
 
-        async function search() {
-            const query = document.getElementById('searchInput').value.trim();
-            const status = document.getElementById('status');
-            const tbody = document.getElementById('resultsBody');
-            
-            if (!query) {
-                status.innerText = 'WARNING: EMPTY_QUERY';
+        status.innerText = 'EXECUTING_SECURE_SEARCH...';
+        tbody.innerHTML = '';
+
+        try {
+            // Профессиональный подход: поиск через ilike по full_name
+            // Библиотека v2 автоматически кодирует кириллицу для предотвращения ошибок Headers
+            const { data, error } = await _supabase
+                .from('burials')
+                .select('*')
+                .ilike('full_name', `%${query}%`);
+
+            if (error) throw error;
+
+            if (!data || data.length === 0) {
+                status.innerText = 'RESULT: NOT_FOUND';
                 return;
             }
 
-            status.innerText = 'EXECUTING_SECURE_QUERY...';
-            tbody.innerHTML = '';
+            status.innerText = `SUCCESS. RECORDS_FOUND: ${data.length}`;
 
-            try {
-                // Используем поиск ilike по колонке full_name
-                const { data, error } = await _supabase
-                    .from('burials') 
-                    .select('*')
-                    .ilike('full_name', `%${query}%`);
+            data.forEach(item => {
+                // Генерация ссылки на карту по координатам
+                const mapCell = (item.latitude && item.longitude && item.latitude !== 'NULL') 
+                    ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="map-link">VIEW</a>`
+                    : '-';
 
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    status.innerText = 'RESULT: NOT_FOUND';
-                    return;
-                }
-
-                status.innerText = `SUCCESS. RECORDS_FOUND: ${data.length}`;
-
-                data.forEach(item => {
-                    // Формируем ссылку на карту, если есть координаты
-                    let mapContent = 'N/A';
-                    if (item.latitude && item.longitude && item.latitude !== 'NULL') {
-                        const url = `https://www.google.com/maps?q=${item.latitude},${item.longitude}`;
-                        mapContent = `<a class="geo-link" href="${url}" target="_blank">VIEW</a>`;
-                    }
-
-                    tbody.innerHTML += `<tr>
-                        <td>${item.full_name || '-'}</td>
-                        <td>${item.birth_date || '-'}</td>
-                        <td>${item.death_date || '-'}</td>
-                        <td>${item.grave_number || '-'}</td>
-                        <td>${item.sector || '-'}</td>
-                        <td>${mapContent}</td>
-                    </tr>`;
-                });
-            } catch (err) {
-                console.error('Failure:', err);
-                status.innerText = 'SYSTEM_ERROR: ' + err.message;
-            }
+                tbody.innerHTML += `<tr>
+                    <td>${item.full_name || '-'}</td>
+                    <td>${item.birth_date || '-'}</td>
+                    <td>${item.death_date || '-'}</td>
+                    <td>${item.grave_number || '-'}</td>
+                    <td>${item.sector || '-'}</td>
+                    <td>${mapCell}</td>
+                </tr>`;
+            });
+        } catch (err) {
+            console.error(err);
+            status.innerText = 'SYSTEM_ERROR: ' + err.message;
         }
+    }
 
-        document.getElementById('searchInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') search();
-        });
-    </script>
+    // Слушатель Enter
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') search();
+    });
+</script>
+
 </body>
 </html>
