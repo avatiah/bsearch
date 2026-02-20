@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Поиск захоронений</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        input { width: 70%; padding: 10px; margin-right: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 20px; cursor: pointer; background: #24b47e; color: white; border: none; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8f8f8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Поиск по базе захоронений</h2>
+        <input type="text" id="searchInput" placeholder="Введите фамилию...">
+        <button onclick="search()">Найти</button>
+        
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>ФИО</th>
+                    <th>Дата смерти</th>
+                    <th>Сектор</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Сюда мы вставим ваши ключи из Шага 2
+        const SUPABASE_URL = 'ВАШ_PROJECT_URL';
+        const SUPABASE_KEY = 'ВАШ_ANON_KEY';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function search() {
+            const query = document.getElementById('searchInput').value;
+            const { data, error } = await supabase
+                .from('burials')
+                .select('*')
+                .ilike('full_name', `%${query}%`); // Поиск по ФИО (регистронезависимый)
+
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+
+            if (data) {
+                data.forEach(item => {
+                    tbody.innerHTML += `<tr>
+                        <td>${item.full_name}</td>
+                        <td>${item.death_date}</td>
+                        <td>${item.sector}</td>
+                    </tr>`;
+                });
+            }
+        }
+    </script>
+</body>
+</html>
