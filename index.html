@@ -24,7 +24,7 @@
         <h2>System: Burial Search Engine</h2>
         <div id="status">READY_FOR_INPUT...</div>
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Введите ФИО (например, Германский)..." autocomplete="off">
+            <input type="text" id="searchInput" placeholder="Введите фамилию (например, Германский)..." autocomplete="off">
             <button onclick="search()">EXECUTE</button>
         </div>
         
@@ -45,10 +45,8 @@
     </div>
 
     <script>
-        // Данные из ваших скриншотов
-        const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co';
-        // Вставьте сюда ваш ключ со скриншота image_e10cc0.png
-        const SUPABASE_KEY = 'ВАШ_SB_PUBLISHABLE_KEY_ЗДЕСЬ'; 
+        const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co'; // Из вашего Project ID
+        const SUPABASE_KEY = 'ВАШ_SB_PUBLISHABLE_KEY_ЗДЕСЬ'; // Тот самый ключ из
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -62,15 +60,15 @@
                 return;
             }
 
-            status.innerText = 'SEARCHING_DATABASE...';
+            status.innerText = 'CONNECTING_TO_DATABASE...';
             tbody.innerHTML = '';
 
             try {
-                // Ищем в таблице 'burials', в колонке 'ФИО'
+                // Ищем в колонке 'full_name' (теперь на английском в базе)
                 const { data, error } = await _supabase
                     .from('burials') 
                     .select('*')
-                    .ilike('ФИО', `%${query}%`); // Используем русское название колонки из вашего скриншота
+                    .ilike('full_name', `%${query}%`);
 
                 if (error) throw error;
 
@@ -83,11 +81,11 @@
 
                 data.forEach(item => {
                     tbody.innerHTML += `<tr>
-                        <td>${item['ФИО'] || '-'}</td>
-                        <td>${item['Дата рождения'] || '-'}</td>
-                        <td>${item['Дата смерти'] || '-'}</td>
-                        <td>${item['№ могилы'] || '-'}</td>
-                        <td>${item['Сектор'] || '-'}</td>
+                        <td>${item.full_name || '-'}</td>
+                        <td>${item.birth_date || '-'}</td>
+                        <td>${item.death_date || '-'}</td>
+                        <td>${item.grave_number || '-'}</td>
+                        <td>${item.sector || '-'}</td>
                     </tr>`;
                 });
             } catch (err) {
@@ -96,7 +94,6 @@
             }
         }
 
-        // Поиск по Enter
         document.getElementById('searchInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') search();
         });
