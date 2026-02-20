@@ -3,45 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM: BURIAL SEARCH ENGINE</title>
+    <title>ПОИСК ЗАХОРОНЕНИЙ | ТЕСТОВАЯ СТРАНИЦА</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; line-height: 1.4; }
-        .container { max-width: 1200px; margin: auto; border: 1px solid #00ff41; padding: 20px; box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); }
-        h2 { border-bottom: 1px solid #00ff41; padding-bottom: 10px; margin-top: 0; letter-spacing: 2px; }
-        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        input { flex: 1; background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 12px; font-family: inherit; font-size: 16px; outline: none; }
-        button { background: #00ff41; color: #000; border: none; padding: 10px 25px; cursor: pointer; font-weight: bold; font-family: inherit; }
-        button:hover { background: #00cc33; }
-        .table-res { overflow-x: auto; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; border: 1px solid #00ff41; }
-        th, td { border: 1px solid #00ff41; padding: 12px; text-align: left; font-size: 14px; }
-        th { background: #003300; text-transform: uppercase; }
-        .map-link { color: #00ff41; text-decoration: underline; font-weight: bold; }
-        #status { margin-bottom: 10px; font-size: 0.9em; height: 1.5em; }
+        :root {
+            --primary-blue: #2563eb;
+            --bg-gray: #f8fafc;
+            --text-dark: #1e293b;
+            --highlight: #fef08a;
+        }
+
+        body { 
+            background: var(--bg-gray); 
+            color: var(--text-dark); 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; 
+            padding: 0;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 0;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .container { 
+            max-width: 1100px; 
+            margin: 40px auto; 
+            padding: 0 20px;
+        }
+
+        .search-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        h2 { margin-top: 0; color: var(--primary-blue); font-weight: 600; }
+
+        .search-box { display: flex; gap: 10px; }
+
+        input { 
+            flex: 1; 
+            padding: 14px 20px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            outline: none; 
+            transition: border-color 0.2s;
+        }
+
+        input:focus { border-color: var(--primary-blue); }
+
+        button { 
+            background: var(--primary-blue); 
+            color: white; 
+            border: none; 
+            padding: 0 30px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: background 0.2s;
+        }
+
+        button:hover { background: #1d4ed8; }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        th { 
+            background: #f1f5f9; 
+            padding: 15px; 
+            text-align: left; 
+            font-size: 13px; 
+            text-transform: uppercase; 
+            color: #64748b;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        th:hover { background: #e2e8f0; }
+        th::after { content: ' ↕'; opacity: 0.3; }
+
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 15px; }
+
+        tr:last-child td { border-bottom: none; }
+
+        tr:hover { background: #f8fafc; }
+
+        .highlight { background-color: var(--highlight); padding: 2px 4px; border-radius: 4px; font-weight: bold; }
+
+        .map-btn {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            border: 1px solid var(--primary-blue);
+            padding: 5px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .map-btn:hover { background: var(--primary-blue); color: white; }
+
+        #status { margin-bottom: 15px; font-size: 14px; color: #64748b; }
     </style>
 </head>
 <body>
 
+<div class="header">
+    <h1> Cemetery Search </h1>
+</div>
+
 <div class="container">
-    <h2>SYSTEM: BURIAL SEARCH ENGINE</h2>
-    <div id="status">READY...</div>
-    
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="ВВЕДИТЕ ФАМИЛИЮ (НАПР. ГЕРМАНСКИЙ)..." autocomplete="off">
-        <button onclick="search()">EXECUTE</button>
+    <div class="search-card">
+        <h2>Поиск по реестру</h2>
+        <div id="status">Готов к работе</div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Введите фамилию (например, Германский)...">
+            <button onclick="search()">НАЙТИ</button>
+        </div>
     </div>
     
-    <div class="table-res">
+    <div class="table-container">
         <table>
             <thead>
                 <tr>
-                    <th>ФИО</th>
-                    <th>ДАТА РОЖД.</th>
-                    <th>ДАТА СМЕРТИ</th>
-                    <th>№ МОГИЛЫ</th>
-                    <th>СЕКТОР</th>
-                    <th>КАРТА</th>
+                    <th onclick="sortTable('full_name')">ФИО</th>
+                    <th onclick="sortTable('birth_date')">Дата рожд.</th>
+                    <th onclick="sortTable('death_date')">Дата смерти</th>
+                    <th onclick="sortTable('grave_number')">№ Могилы</th>
+                    <th onclick="sortTable('sector')">Сектор</th>
+                    <th>Карта</th>
                 </tr>
             </thead>
             <tbody id="resultsBody"></tbody>
@@ -50,11 +154,19 @@
 </div>
 
 <script>
-    // Конфигурация из ваших настроек
     const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_SHiQs5LAw5FbDQpu6N3b1Q_bM_Ms1DI';
-    
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentData = [];
+    let sortOrder = {};
+
+    // Функция выделения текста
+    function highlightText(text, query) {
+        if (!query) return text;
+        const regex = new RegExp(`(${query})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    }
 
     async function search() {
         const query = document.getElementById('searchInput').value.trim();
@@ -62,16 +174,14 @@
         const tbody = document.getElementById('resultsBody');
         
         if (!query) {
-            status.innerText = 'WARNING: EMPTY_QUERY';
+            status.innerText = 'Введите запрос для поиска';
             return;
         }
 
-        status.innerText = 'EXECUTING_SECURE_SEARCH...';
+        status.innerText = 'Поиск в базе данных...';
         tbody.innerHTML = '';
 
         try {
-            // Профессиональный подход: поиск через ilike по full_name
-            // Библиотека v2 автоматически кодирует кириллицу для предотвращения ошибок Headers
             const { data, error } = await _supabase
                 .from('burials')
                 .select('*')
@@ -80,34 +190,60 @@
             if (error) throw error;
 
             if (!data || data.length === 0) {
-                status.innerText = 'RESULT: NOT_FOUND';
+                status.innerText = 'Результатов не найдено';
+                currentData = [];
                 return;
             }
 
-            status.innerText = `SUCCESS. RECORDS_FOUND: ${data.length}`;
+            currentData = data;
+            renderTable(data, query);
+            status.innerText = `Найдено записей: ${data.length}`;
 
-            data.forEach(item => {
-                // Генерация ссылки на карту по координатам
-                const mapCell = (item.latitude && item.longitude && item.latitude !== 'NULL') 
-                    ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="map-link">VIEW</a>`
-                    : '-';
-
-                tbody.innerHTML += `<tr>
-                    <td>${item.full_name || '-'}</td>
-                    <td>${item.birth_date || '-'}</td>
-                    <td>${item.death_date || '-'}</td>
-                    <td>${item.grave_number || '-'}</td>
-                    <td>${item.sector || '-'}</td>
-                    <td>${mapCell}</td>
-                </tr>`;
-            });
         } catch (err) {
-            console.error(err);
-            status.innerText = 'SYSTEM_ERROR: ' + err.message;
+            status.innerText = 'Ошибка системы: ' + err.message;
         }
     }
 
-    // Слушатель Enter
+    function renderTable(data, query = '') {
+        const tbody = document.getElementById('resultsBody');
+        tbody.innerHTML = '';
+
+        data.forEach(item => {
+            const mapCell = (item.latitude && item.longitude) 
+                ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="map-btn">КАРТА</a>`
+                : '-';
+
+            tbody.innerHTML += `<tr>
+                <td>${highlightText(item.full_name || '-', query)}</td>
+                <td>${item.birth_date || '-'}</td>
+                <td>${item.death_date || '-'}</td>
+                <td>${item.grave_number || '-'}</td>
+                <td>${item.sector || '-'}</td>
+                <td>${mapCell}</td>
+            </tr>`;
+        });
+    }
+
+    // Профессиональная сортировка
+    function sortTable(column) {
+        if (currentData.length === 0) return;
+        
+        sortOrder[column] = !sortOrder[column];
+        
+        const sorted = [...currentData].sort((a, b) => {
+            let valA = a[column] || '';
+            let valB = b[column] || '';
+            
+            if (sortOrder[column]) {
+                return valA.toString().localeCompare(valB.toString());
+            } else {
+                return valB.toString().localeCompare(valA.toString());
+            }
+        });
+
+        renderTable(sorted, document.getElementById('searchInput').value.trim());
+    }
+
     document.getElementById('searchInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') search();
     });
