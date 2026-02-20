@@ -2,30 +2,77 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Поиск захоронений</title>
+    <title>THREAT ENGINE: BURIAL DATABASE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        input { width: 70%; padding: 10px; margin-right: 10px; border: 1px solid #ddd; border-radius: 4px; }
-        button { padding: 10px 20px; cursor: pointer; background: #24b47e; color: white; border: none; border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #f8f8f8; }
+        /* Стиль: Black background, Monospace, Green accent */
+        body { 
+            background-color: #0a0a0a; 
+            color: #00ff41; 
+            font-family: 'Courier New', Courier, monospace; 
+            padding: 20px; 
+            margin: 0;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: auto; 
+            border: 1px solid #00ff41; 
+            padding: 20px; 
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+        }
+        h2 { border-bottom: 1px solid #00ff41; padding-bottom: 10px; text-transform: uppercase; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { 
+            flex-grow: 1; 
+            background: #000; 
+            border: 1px solid #00ff41; 
+            color: #00ff41; 
+            padding: 10px; 
+            font-family: inherit;
+        }
+        button { 
+            background: #00ff41; 
+            color: #000; 
+            border: none; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-family: inherit;
+        }
+        button:hover { background: #008f11; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; /* Straight table borders */
+            margin-top: 20px; 
+        }
+        th, td { 
+            border: 1px solid #00ff41; /* Straight borders */
+            padding: 10px; 
+            text-align: left; 
+        }
+        th { background: #003300; }
+        .geo-link { color: #00ff41; text-decoration: underline; }
+        #status { margin-bottom: 10px; font-size: 0.8em; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Поиск по базе захоронений</h2>
-        <input type="text" id="searchInput" placeholder="Введите фамилию...">
-        <button onclick="search()">Найти</button>
+        <h2>System: Burial Search Engine</h2>
+        <div id="status">READY_TO_SEARCH...</div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="ENTER_NAME_QUERY...">
+            <button onclick="search()">EXECUTE</button>
+        </div>
         
-        <table id="resultsTable">
+        <table>
             <thead>
                 <tr>
                     <th>ФИО</th>
-                    <th>Дата смерти</th>
-                    <th>Сектор</th>
+                    <th>ДАТА_РОЖД.</th>
+                    <th>ДАТА_СМЕРТИ</th>
+                    <th>№_МОГИЛЫ</th>
+                    <th>СЕКТОР</th>
+                    <th>GEO_DATA</th>
                 </tr>
             </thead>
             <tbody id="resultsBody"></tbody>
@@ -33,29 +80,47 @@
     </div>
 
     <script>
-        // Сюда мы вставим ваши ключи из Шага 2
-        const SUPABASE_URL = 'grqwgutmyakfagegqupy';
-        const SUPABASE_KEY = 'grqwgutmyakfagegqupy';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co';
+        // ВСТАВЬТЕ СКОПИРОВАННЫЙ КЛЮЧ (sb_publishable...) НИЖЕ:
+        const SUPABASE_KEY = 'sb_publishable_SHiQs5LAw5FbDQpu6N3b1Q_bM_Ms1DI'; 
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function search() {
-            const query = document.getElementById('searchInput').value;
-            const { data, error } = await supabase
-                .from('burials')
-                .select('*')
-                .ilike('full_name', `%${query}%`); // Поиск по ФИО (регистронезависимый)
-
+            const query = document.getElementById('searchInput').value.trim();
+            const status = document.getElementById('status');
             const tbody = document.getElementById('resultsBody');
+            
+            status.innerText = 'SEARCHING_DATABASE...';
             tbody.innerHTML = '';
 
-            if (data) {
+            try {
+                const { data, error } = await _supabase
+                    .from('burials')
+                    .select('*')
+                    .ilike('full_name', `%${query}%`);
+
+                if (error) throw error;
+                status.innerText = `DONE. RECORDS_FOUND: ${data.length}`;
+
                 data.forEach(item => {
+                    const lat = item.latitude || '0';
+                    const lon = item.longitude || '0';
+                    const geo = (item.latitude) 
+                        ? `<a class="geo-link" href="https://www.google.com/maps?q=${lat},${lon}" target="_blank">VIEW_MAP</a>` 
+                        : 'NO_DATA';
+
                     tbody.innerHTML += `<tr>
-                        <td>${item.full_name}</td>
-                        <td>${item.death_date}</td>
-                        <td>${item.sector}</td>
+                        <td>${item.full_name || '-'}</td>
+                        <td>${item.birth_date || '-'}</td>
+                        <td>${item.death_date || '-'}</td>
+                        <td>${item.grave_number || '-'}</td>
+                        <td>${item.sector || '-'}</td>
+                        <td>${geo}</td>
                     </tr>`;
                 });
+            } catch (err) {
+                status.innerText = 'SYSTEM_ERROR: ' + err.message;
             }
         }
     </script>
