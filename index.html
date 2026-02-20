@@ -10,14 +10,13 @@
         h2 { border-bottom: 1px solid #00ff41; padding-bottom: 10px; text-transform: uppercase; margin-top: 0; }
         .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
         input { flex-grow: 1; background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 12px; font-family: inherit; font-size: 16px; outline: none; }
-        button { background: #00ff41; color: #000; border: none; padding: 10px 25px; cursor: pointer; font-weight: bold; font-family: inherit; transition: 0.2s; }
+        button { background: #00ff41; color: #000; border: none; padding: 10px 25px; cursor: pointer; font-weight: bold; font-family: inherit; }
         button:hover { background: #008f11; }
         .table-res { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #00ff41; padding: 12px; text-align: left; font-size: 14px; }
         th { background: #003300; text-transform: uppercase; }
-        .geo-link { color: #00ff41; text-decoration: underline; font-weight: bold; }
-        #status { margin-bottom: 15px; font-size: 0.9em; height: 1.2em; }
+        #status { margin-bottom: 15px; font-size: 0.9em; min-height: 1.2em; }
     </style>
 </head>
 <body>
@@ -25,7 +24,7 @@
         <h2>System: Burial Search Engine</h2>
         <div id="status">READY_FOR_INPUT...</div>
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="ENTER_NAME_QUERY (e.g. Фикман)..." autocomplete="off">
+            <input type="text" id="searchInput" placeholder="Введите ФИО (например, Германский)..." autocomplete="off">
             <button onclick="search()">EXECUTE</button>
         </div>
         
@@ -34,11 +33,10 @@
                 <thead>
                     <tr>
                         <th>ФИО</th>
-                        <th>ДАТА_РОЖД.</th>
-                        <th>ДАТА_СМЕРТИ</th>
-                        <th>№_МОГИЛЫ</th>
+                        <th>ДАТА РОЖДЕНИЯ</th>
+                        <th>ДАТА СМЕРТИ</th>
+                        <th>№ МОГИЛЫ</th>
                         <th>СЕКТОР</th>
-                        <th>GEO_DATA</th>
                     </tr>
                 </thead>
                 <tbody id="resultsBody"></tbody>
@@ -47,10 +45,10 @@
     </div>
 
     <script>
-        // Данные подключения (Project ID: grqwgutmyakfagegqupy)
+        // Данные из ваших скриншотов
         const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co';
-        // ВСТАВЬТЕ ВАШ Publishable Key НИЖЕ
-        const SUPABASE_KEY = 'sb_publishable_SHiQs5LAw5FbDQpu6N3b1Q_bM_Ms1DI'; 
+        // Вставьте сюда ваш ключ со скриншота image_e10cc0.png
+        const SUPABASE_KEY = 'ВАШ_SB_PUBLISHABLE_KEY_ЗДЕСЬ'; 
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -68,11 +66,11 @@
             tbody.innerHTML = '';
 
             try {
-                // Пытаемся найти записи в таблице burials
+                // Ищем в таблице 'burials', в колонке 'ФИО'
                 const { data, error } = await _supabase
                     .from('burials') 
                     .select('*')
-                    .ilike('full_name', `%${query}%`);
+                    .ilike('ФИО', `%${query}%`); // Используем русское название колонки из вашего скриншота
 
                 if (error) throw error;
 
@@ -84,27 +82,21 @@
                 status.innerText = `SUCCESS. RECORDS_FOUND: ${data.length}`;
 
                 data.forEach(item => {
-                    // Формируем ссылку на Google Карты, если есть координаты
-                    const geo = (item.latitude && item.longitude) 
-                        ? `<a class="geo-link" href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank">MAP_LINK</a>` 
-                        : 'NO_COORDS';
-
                     tbody.innerHTML += `<tr>
-                        <td>${item.full_name || '-'}</td>
-                        <td>${item.birth_date || '-'}</td>
-                        <td>${item.death_date || '-'}</td>
-                        <td>${item.grave_number || '-'}</td>
-                        <td>${item.sector || '-'}</td>
-                        <td>${geo}</td>
+                        <td>${item['ФИО'] || '-'}</td>
+                        <td>${item['Дата рождения'] || '-'}</td>
+                        <td>${item['Дата смерти'] || '-'}</td>
+                        <td>${item['№ могилы'] || '-'}</td>
+                        <td>${item['Сектор'] || '-'}</td>
                     </tr>`;
                 });
             } catch (err) {
                 console.error(err);
-                status.innerText = 'SYSTEM_ERROR: ' + err.message + '. Check table name in Supabase!';
+                status.innerText = 'SYSTEM_ERROR: ' + err.message;
             }
         }
 
-        // Поиск по нажатию Enter
+        // Поиск по Enter
         document.getElementById('searchInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') search();
         });
