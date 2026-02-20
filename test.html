@@ -11,12 +11,13 @@
             --bg-gray: #f8fafc;
             --text-dark: #1e293b;
             --highlight: #fef08a;
+            --accent-green: #22c55e;
         }
 
         body { 
             background: var(--bg-gray); 
             color: var(--text-dark); 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif; 
             margin: 0; 
             padding: 0;
         }
@@ -81,43 +82,58 @@
 
         table { width: 100%; border-collapse: collapse; }
 
+        /* Улучшенные стили заголовков со стрелками */
         th { 
             background: #f1f5f9; 
             padding: 15px; 
             text-align: left; 
-            font-size: 13px; 
+            font-size: 12px; 
             text-transform: uppercase; 
             color: #64748b;
             cursor: pointer;
             user-select: none;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            position: relative;
+            white-space: nowrap;
         }
 
-        th:hover { background: #e2e8f0; }
-        th::after { content: ' ↕'; opacity: 0.3; }
+        th:hover { background: #e2e8f0; color: var(--primary-blue); }
+
+        /* Базовое состояние стрелки (неактивно) */
+        th::after {
+            content: '↕';
+            margin-left: 8px;
+            font-size: 14px;
+            color: #cbd5e1;
+            transition: color 0.2s;
+        }
+
+        /* Активная колонка */
+        th.sort-asc { color: var(--primary-blue); background: #eff6ff; }
+        th.sort-desc { color: var(--primary-blue); background: #eff6ff; }
+
+        th.sort-asc::after { content: '↑'; color: var(--primary-blue); font-weight: bold; }
+        th.sort-desc::after { content: '↓'; color: var(--primary-blue); font-weight: bold; }
 
         td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 15px; }
-
-        tr:last-child td { border-bottom: none; }
-
         tr:hover { background: #f8fafc; }
 
-        .highlight { background-color: var(--highlight); padding: 2px 4px; border-radius: 4px; font-weight: bold; }
+        .highlight { background-color: var(--highlight); padding: 2px 2px; border-radius: 2px; color: #000; font-weight: bold; }
 
         .map-btn {
             color: var(--primary-blue);
             text-decoration: none;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             border: 1px solid var(--primary-blue);
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 6px;
             transition: all 0.2s;
         }
 
         .map-btn:hover { background: var(--primary-blue); color: white; }
 
-        #status { margin-bottom: 15px; font-size: 14px; color: #64748b; }
+        #status { margin-bottom: 15px; font-size: 14px; color: #64748b; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -129,9 +145,9 @@
 <div class="container">
     <div class="search-card">
         <h2>Поиск по реестру</h2>
-        <div id="status">Готов к работе</div>
+        <div id="status">Система готова. Введите фамилию.</div>
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Введите фамилию (например, Германский)...">
+            <input type="text" id="searchInput" placeholder="Введите фамилию (напр. Германский)...">
             <button onclick="search()">НАЙТИ</button>
         </div>
     </div>
@@ -140,11 +156,11 @@
         <table>
             <thead>
                 <tr>
-                    <th onclick="sortTable('full_name')">ФИО</th>
-                    <th onclick="sortTable('birth_date')">Дата рожд.</th>
-                    <th onclick="sortTable('death_date')">Дата смерти</th>
-                    <th onclick="sortTable('grave_number')">№ Могилы</th>
-                    <th onclick="sortTable('sector')">Сектор</th>
+                    <th id="th-full_name" onclick="sortTable('full_name')">ФИО</th>
+                    <th id="th-birth_date" onclick="sortTable('birth_date')">Дата рожд.</th>
+                    <th id="th-death_date" onclick="sortTable('death_date')">Дата смерти</th>
+                    <th id="th-grave_number" onclick="sortTable('grave_number')">№ Могилы</th>
+                    <th id="th-sector" onclick="sortTable('sector')">Сектор</th>
                     <th>Карта</th>
                 </tr>
             </thead>
@@ -159,9 +175,9 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentData = [];
-    let sortOrder = {};
+    let currentSortColumn = null;
+    let isAscending = true;
 
-    // Функция выделения текста
     function highlightText(text, query) {
         if (!query) return text;
         const regex = new RegExp(`(${query})`, 'gi');
@@ -174,11 +190,11 @@
         const tbody = document.getElementById('resultsBody');
         
         if (!query) {
-            status.innerText = 'Введите запрос для поиска';
+            status.innerText = '⚠️ Пожалуйста, введите фамилию';
             return;
         }
 
-        status.innerText = 'Поиск в базе данных...';
+        status.innerText = '🔍 Поиск в базе данных...';
         tbody.innerHTML = '';
 
         try {
@@ -190,17 +206,18 @@
             if (error) throw error;
 
             if (!data || data.length === 0) {
-                status.innerText = 'Результатов не найдено';
+                status.innerText = '❌ Записей не найдено';
                 currentData = [];
                 return;
             }
 
             currentData = data;
             renderTable(data, query);
-            status.innerText = `Найдено записей: ${data.length}`;
+            status.innerText = `✅ Найдено записей: ${data.length}`;
+            resetSortIcons();
 
         } catch (err) {
-            status.innerText = 'Ошибка системы: ' + err.message;
+            status.innerText = '❌ Ошибка: ' + err.message;
         }
     }
 
@@ -210,8 +227,8 @@
 
         data.forEach(item => {
             const mapCell = (item.latitude && item.longitude) 
-                ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="map-btn">КАРТА</a>`
-                : '-';
+                ? `<a href="http://googleusercontent.com/maps.google.com/?q=${item.latitude},${item.longitude}" target="_blank" class="map-btn">КАРТА</a>`
+                : '<span style="color:#cbd5e1">-</span>';
 
             tbody.innerHTML += `<tr>
                 <td>${highlightText(item.full_name || '-', query)}</td>
@@ -224,24 +241,47 @@
         });
     }
 
-    // Профессиональная сортировка
     function sortTable(column) {
         if (currentData.length === 0) return;
         
-        sortOrder[column] = !sortOrder[column];
-        
+        // Переключаем направление, если кликнули по той же колонке
+        if (currentSortColumn === column) {
+            isAscending = !isAscending;
+        } else {
+            isAscending = true;
+            currentSortColumn = column;
+        }
+
+        // Обновляем визуальное состояние заголовков
+        updateSortIcons(column);
+
         const sorted = [...currentData].sort((a, b) => {
             let valA = a[column] || '';
             let valB = b[column] || '';
             
-            if (sortOrder[column]) {
-                return valA.toString().localeCompare(valB.toString());
-            } else {
-                return valB.toString().localeCompare(valA.toString());
-            }
+            let result = valA.toString().localeCompare(valB.toString(), 'ru');
+            return isAscending ? result : -result;
         });
 
         renderTable(sorted, document.getElementById('searchInput').value.trim());
+    }
+
+    function resetSortIcons() {
+        document.querySelectorAll('th').forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+        });
+        currentSortColumn = null;
+    }
+
+    function updateSortIcons(activeColumn) {
+        document.querySelectorAll('th').forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+        });
+        
+        const activeTh = document.getElementById(`th-${activeColumn}`);
+        if (activeTh) {
+            activeTh.classList.add(isAscending ? 'sort-asc' : 'sort-desc');
+        }
     }
 
     document.getElementById('searchInput').addEventListener('keypress', (e) => {
