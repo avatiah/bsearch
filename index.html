@@ -12,9 +12,11 @@
         input { flex-grow: 1; background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 12px; font-family: inherit; font-size: 16px; outline: none; }
         button { background: #00ff41; color: #000; border: none; padding: 10px 25px; cursor: pointer; font-weight: bold; font-family: inherit; }
         button:hover { background: #008f11; }
+        .table-res { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #00ff41; padding: 12px; text-align: left; font-size: 14px; }
         th { background: #003300; text-transform: uppercase; }
+        .geo-link { color: #00ff41; text-decoration: underline; font-weight: bold; }
         #status { margin-bottom: 15px; font-size: 0.9em; min-height: 1.2em; }
     </style>
 </head>
@@ -23,27 +25,30 @@
         <h2>System: Burial Search Engine</h2>
         <div id="status">READY_FOR_INPUT...</div>
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Введите фамилию (напр. Германский)..." autocomplete="off">
+            <input type="text" id="searchInput" placeholder="Введите фамилию (например, германский)..." autocomplete="off">
             <button onclick="search()">EXECUTE</button>
         </div>
         
-        <table>
-            <thead>
-                <tr>
-                    <th>ФИО</th>
-                    <th>ДАТА РОЖДЕНИЯ</th>
-                    <th>ДАТА СМЕРТИ</th>
-                    <th>№ МОГИЛЫ</th>
-                    <th>СЕКТОР</th>
-                </tr>
-            </thead>
-            <tbody id="resultsBody"></tbody>
-        </table>
+        <div class="table-res">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ФИО</th>
+                        <th>ДАТА РОЖДЕНИЯ</th>
+                        <th>ДАТА СМЕРТИ</th>
+                        <th>№ МОГИЛЫ</th>
+                        <th>СЕКТОР</th>
+                        <th>КАРТА</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody"></tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co'; 
-        const SUPABASE_KEY = 'sb_publishable_SHiQs5LAw5FbDQpu6N3b1Q_bM_Ms1DI'; 
+        const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co'; // Ваш Project ID
+        const SUPABASE_KEY = 'ВСТАВЬТЕ_КЛЮЧ_ИЗ_IMAGE_E10CC0'; // Ваш Publishable Key
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -57,10 +62,11 @@
                 return;
             }
 
-            status.innerText = 'EXECUTING_REMOTE_QUERY...';
+            status.innerText = 'SEARCHING_DATABASE...';
             tbody.innerHTML = '';
 
             try {
+                // ilike делает поиск нечувствительным к регистру (А = а)
                 const { data, error } = await _supabase
                     .from('burials') 
                     .select('*')
@@ -76,12 +82,18 @@
                 status.innerText = `SUCCESS. RECORDS_FOUND: ${data.length}`;
 
                 data.forEach(item => {
+                    // Создаем ссылку на карту, если координаты заполнены
+                    const mapLink = (item.latitude && item.longitude) 
+                        ? `<a class="geo-link" href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank">MAP</a>` 
+                        : '-';
+
                     tbody.innerHTML += `<tr>
                         <td>${item.full_name || '-'}</td>
                         <td>${item.birth_date || '-'}</td>
                         <td>${item.death_date || '-'}</td>
                         <td>${item.grave_number || '-'}</td>
                         <td>${item.sector || '-'}</td>
+                        <td>${mapLink}</td>
                     </tr>`;
                 });
             } catch (err) {
