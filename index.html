@@ -12,7 +12,6 @@
         input { flex-grow: 1; background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 12px; font-family: inherit; font-size: 16px; outline: none; }
         button { background: #00ff41; color: #000; border: none; padding: 10px 25px; cursor: pointer; font-weight: bold; font-family: inherit; }
         button:hover { background: #008f11; }
-        .table-res { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #00ff41; padding: 12px; text-align: left; font-size: 14px; }
         th { background: #003300; text-transform: uppercase; }
@@ -24,29 +23,27 @@
         <h2>System: Burial Search Engine</h2>
         <div id="status">READY_FOR_INPUT...</div>
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Введите фамилию (например, Германский)..." autocomplete="off">
+            <input type="text" id="searchInput" placeholder="Введите фамилию (напр. Германский)..." autocomplete="off">
             <button onclick="search()">EXECUTE</button>
         </div>
         
-        <div class="table-res">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ФИО</th>
-                        <th>ДАТА РОЖДЕНИЯ</th>
-                        <th>ДАТА СМЕРТИ</th>
-                        <th>№ МОГИЛЫ</th>
-                        <th>СЕКТОР</th>
-                    </tr>
-                </thead>
-                <tbody id="resultsBody"></tbody>
-            </table>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ФИО</th>
+                    <th>ДАТА РОЖДЕНИЯ</th>
+                    <th>ДАТА СМЕРТИ</th>
+                    <th>№ МОГИЛЫ</th>
+                    <th>СЕКТОР</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+        </table>
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co'; // Из вашего Project ID
-        const SUPABASE_KEY = 'sb_publishable_SHiQs5LAw5FbDQpu6N3b1Q_bM_Ms1DI'; // Тот самый ключ из
+        const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co'; 
+        const SUPABASE_KEY = 'sb_publishable_SHiQs5LAw5FbDQpu6N3b1Q_bM_Ms1DI'; 
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -60,11 +57,10 @@
                 return;
             }
 
-            status.innerText = 'CONNECTING_TO_DATABASE...';
+            status.innerText = 'EXECUTING_REMOTE_QUERY...';
             tbody.innerHTML = '';
 
             try {
-                // Ищем в колонке 'full_name' (теперь на английском в базе)
                 const { data, error } = await _supabase
                     .from('burials') 
                     .select('*')
@@ -89,7 +85,6 @@
                     </tr>`;
                 });
             } catch (err) {
-                console.error(err);
                 status.innerText = 'SYSTEM_ERROR: ' + err.message;
             }
         }
