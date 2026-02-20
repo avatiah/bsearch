@@ -6,7 +6,6 @@
     <title>SYSTEM: BURIAL SEARCH ENGINE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Оформление в стиле консоли управления угрозами */
         body { 
             background-color: #0a0a0a; 
             color: #00ff41; 
@@ -53,39 +52,13 @@
             font-family: inherit; 
             text-transform: uppercase;
         }
-        button:hover { 
-            background: #008f11; 
-        }
-        .table-res { 
-            overflow-x: auto; 
-            margin-top: 20px;
-        }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            border: 1px solid #00ff41; 
-        }
-        th, td { 
-            border: 1px solid #00ff41; 
-            padding: 12px; 
-            text-align: left; 
-            font-size: 14px; 
-        }
-        th { 
-            background: #003300; 
-            text-transform: uppercase; 
-        }
-        .geo-link { 
-            color: #00ff41; 
-            text-decoration: underline; 
-            font-weight: bold; 
-        }
-        #status { 
-            margin-bottom: 15px; 
-            font-size: 0.9em; 
-            min-height: 1.2em; 
-            color: #00ff41;
-        }
+        button:hover { background: #008f11; }
+        .table-res { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; border: 1px solid #00ff41; }
+        th, td { border: 1px solid #00ff41; padding: 12px; text-align: left; font-size: 14px; }
+        th { background: #003300; text-transform: uppercase; }
+        .geo-link { color: #00ff41; text-decoration: underline; font-weight: bold; }
+        #status { margin-bottom: 15px; font-size: 0.9em; min-height: 1.2em; color: #00ff41; }
     </style>
 </head>
 <body>
@@ -110,14 +83,13 @@
                         <th>КАРТА</th>
                     </tr>
                 </thead>
-                <tbody id="resultsBody">
-                    </tbody>
+                <tbody id="resultsBody"></tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // Инициализация подключения к Supabase
+        // Инициализация
         const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_SHiQs5LAw5FbDQpu6N3b1Q_bM_Ms1DI'; 
         
@@ -133,12 +105,11 @@
                 return;
             }
 
-            status.innerText = 'EXECUTING_REMOTE_QUERY...';
+            status.innerText = 'EXECUTING_SECURE_QUERY...';
             tbody.innerHTML = '';
 
             try {
-                // Выполняем поиск по колонке full_name, игнорируя регистр
-                // Использование .or() и кодирование через библиотеку предотвращает ошибку Headers
+                // Используем поиск ilike по колонке full_name
                 const { data, error } = await _supabase
                     .from('burials') 
                     .select('*')
@@ -154,10 +125,12 @@
                 status.innerText = `SUCCESS. RECORDS_FOUND: ${data.length}`;
 
                 data.forEach(item => {
-                    // Создание ссылки на Google Карты на основе координат из базы
-                    const mapLink = (item.latitude && item.longitude) 
-                        ? `<a class="geo-link" href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank">VIEW_MAP</a>` 
-                        : 'N/A';
+                    // Формируем ссылку на карту, если есть координаты
+                    let mapContent = 'N/A';
+                    if (item.latitude && item.longitude && item.latitude !== 'NULL') {
+                        const url = `https://www.google.com/maps?q=${item.latitude},${item.longitude}`;
+                        mapContent = `<a class="geo-link" href="${url}" target="_blank">VIEW</a>`;
+                    }
 
                     tbody.innerHTML += `<tr>
                         <td>${item.full_name || '-'}</td>
@@ -165,16 +138,15 @@
                         <td>${item.death_date || '-'}</td>
                         <td>${item.grave_number || '-'}</td>
                         <td>${item.sector || '-'}</td>
-                        <td>${mapLink}</td>
+                        <td>${mapContent}</td>
                     </tr>`;
                 });
             } catch (err) {
-                console.error('System Failure:', err);
+                console.error('Failure:', err);
                 status.innerText = 'SYSTEM_ERROR: ' + err.message;
             }
         }
 
-        // Поиск по нажатию клавиши Enter
         document.getElementById('searchInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') search();
         });
