@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кишиневское Еврейское Кладбище | Реестр BSearch</title>
+    <title>Кишиневское Еврейское Кладбище | BSearch</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --brand-color: #1e3a8a;
-            --accent-color: #3b82f6;
             --bg-main: #fcfcfd;
             --text-main: #1f2937;
             --text-muted: #6b7280;
             --border: #e5e7eb;
-            --info-panel-bg: #eff6ff;
         }
 
         body { 
@@ -22,18 +20,17 @@
             line-height: 1.6;
         }
 
-        /* Hero секция */
+        /* Hero */
         .hero-section {
             position: relative; background: var(--brand-color); color: white;
-            padding: 60px 20px; text-align: center; overflow: hidden;
+            padding: 60px 20px; text-align: center;
         }
         .hero-bg {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background-image: url('https://images.unsplash.com/photo-1590059392135-cc04192667d4?q=80&w=2000&auto=format&fit=crop');
             background-size: cover; background-position: center; opacity: 0.15; z-index: 1;
         }
-        .hero-content { position: relative; z-index: 2; max-width: 800px; margin: 0 auto; }
-        .hero-content h1 { font-size: 2.2rem; margin: 0 0 10px; font-weight: 700; }
+        .hero-content { position: relative; z-index: 2; }
 
         .container { max-width: 1000px; margin: -40px auto 40px; padding: 0 20px; position: relative; z-index: 3; }
 
@@ -42,70 +39,57 @@
             background: white; padding: 30px; border-radius: 12px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid var(--border);
         }
-        .search-group { display: flex; gap: 12px; margin-top: 20px; }
+        .search-group { display: flex; gap: 10px; margin-top: 15px; }
         input, textarea { 
-            flex: 1; padding: 16px 20px; border: 1px solid var(--border); 
-            border-radius: 8px; font-size: 16px; outline: none; font-family: inherit;
+            flex: 1; padding: 16px; border: 1px solid var(--border); 
+            border-radius: 8px; font-size: 16px; outline: none; width: 100%; box-sizing: border-box;
         }
 
-        .btn-search, .btn-submit { 
+        .btn-main { 
             background: var(--brand-color); color: white; border: none;
-            padding: 0 40px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;
+            padding: 16px 30px; border-radius: 8px; font-weight: 700; cursor: pointer;
         }
-        .btn-search:hover, .btn-submit:hover { background: #172554; }
 
-        /* Таблица результатов */
+        /* Таблица */
         .results-wrapper { margin-top: 30px; }
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-        th { background: #f9fafb; padding: 16px; text-align: left; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); cursor: pointer; }
-        td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 15px; }
+        th { background: #f9fafb; padding: 16px; text-align: left; font-size: 12px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border); cursor: pointer; }
+        td { padding: 16px; border-bottom: 1px solid var(--border); }
 
-        /* Форма обратной связи */
-        .contact-section {
-            background: white; border-radius: 12px; border: 1px solid var(--border);
-            padding: 30px; margin: 40px 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        /* Форма обратной связи - ТЕПЕРЬ ВИДНА ЧЕТКО */
+        .contact-box {
+            background: white; border: 1px solid var(--border); border-radius: 12px;
+            padding: 30px; margin: 40px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .contact-section h3 { margin-top: 0; color: var(--brand-color); }
-        .contact-form { display: flex; flex-direction: column; gap: 15px; }
-        .btn-submit { padding: 16px; width: 100%; }
-
-        /* Блок информации / Рекламы */
-        .info-panel {
-            background: var(--info-panel-bg); border-radius: 12px;
-            margin: 40px 0 20px 0; padding: 25px; text-align: center;
-            color: var(--brand-color); border: 1px solid #dbeafe;
-        }
+        .contact-box h3 { margin-top: 0; color: var(--brand-color); }
+        .contact-form { display: grid; gap: 15px; }
 
         /* Карта */
-        .map-section {
+        .map-box {
             background: white; border-radius: 12px; border: 1px solid var(--border); 
-            overflow: hidden; padding: 10px; margin-bottom: 20px;
+            overflow: hidden; padding: 10px; margin-top: 30px;
         }
 
         /* Мобильная адаптация */
         @media (max-width: 768px) {
-            body { font-weight: 500; } /* Плотный шрифт для мобильных */
-            .hero-content h1 { font-size: 1.6rem; }
+            body { font-weight: 500; } /* Усиление веса шрифта */
             .search-group { flex-direction: column; }
-            .btn-search { padding: 16px; }
-
             table thead { display: none; }
             table, tbody, tr, td { display: block; width: 100%; }
             tr { background: white; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border); padding: 15px; }
             td { 
                 display: flex; justify-content: center; align-items: center; 
                 flex-direction: column; text-align: center; padding: 12px 0; 
-                border-bottom: 1px solid #f3f4f6; font-weight: 600;
+                border-bottom: 1px solid #f3f4f6; font-weight: 700; /* Жирные данные */
             }
             td::before { 
                 content: attr(data-label); font-size: 10px; color: var(--text-muted); 
                 text-transform: uppercase; font-weight: 800; margin-bottom: 4px;
             }
-            .td-name { font-size: 1.3rem; color: var(--brand-color); border-bottom: 2px solid #eff6ff; }
         }
 
-        .highlight { background: #dbeafe; color: #1e40af; font-weight: 700; padding: 0 2px; }
-        .main-footer { background: white; border-top: 1px solid var(--border); padding: 40px 20px; text-align: center; color: var(--text-muted); }
+        .highlight { background: #fef08a; color: #000; font-weight: 700; padding: 0 2px; }
+        .footer { padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 14px; border-top: 1px solid var(--border); background: white; }
     </style>
 </head>
 <body>
@@ -114,21 +98,21 @@
     <div class="hero-bg"></div>
     <div class="hero-content">
         <h1>Кишиневское Еврейское Кладбище</h1>
-        <p>Электронный реестр и архив памяти</p>
+        <p>Электронный архив BSearch</p>
     </div>
 </div>
 
 <div class="container">
     <div class="search-card" id="searchArea">
-        <div id="status" style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px;">Система готова к поиску</div>
+        <div id="status" style="font-size: 14px; color: var(--text-muted);">Введите фамилию для поиска в реестре:</div>
         <div class="search-group">
-            <input type="text" id="searchInput" placeholder="Введите фамилию..." inputmode="search">
-            <button class="btn-search" onclick="performSearch()">ИСКАТЬ</button>
+            <input type="text" id="searchInput" placeholder="Напр: Германский" inputmode="search">
+            <button class="btn-main" onclick="performSearch()">НАЙТИ</button>
         </div>
     </div>
 
     <div class="results-wrapper">
-        <button onclick="resetUI()" id="backBtn" style="display:none; margin-bottom: 20px; padding: 10px 20px; cursor:pointer; border-radius:6px; border:none; background:#e5e7eb; font-weight:600;">← Новый поиск</button>
+        <button onclick="resetUI()" id="backBtn" style="display:none; margin-bottom: 20px; padding: 10px 20px; cursor:pointer; font-weight:bold; border-radius:8px; border:1px solid var(--border);">← Новый поиск</button>
         <table id="resultsTable" style="display: none;">
             <thead>
                 <tr>
@@ -143,36 +127,30 @@
         </table>
     </div>
 
-    <div class="info-panel">
-        <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 5px;">Помощь в сохранении памяти</div>
-        <div style="font-size: 15px;">Мы работаем над тем, чтобы история каждой семьи была сохранена для потомков.</div>
+    <div style="background: #eff6ff; padding: 20px; border-radius: 12px; margin-top: 40px; text-align: center; border: 1px solid #dbeafe;">
+        <strong>Уточнение данных</strong><br>
+        Если у вас есть фото или информация о захоронении, которой нет в базе, пожалуйста, напишите нам.
     </div>
 
-    <div class="contact-section">
+    <div class="contact-box">
         <h3>Обратная связь</h3>
-        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
-            Используйте эту форму, чтобы сообщить об ошибке или предложить дополнение к реестру.
-        </p>
         <form action="https://formspree.io/f/xvzbwgzp" method="POST" class="contact-form">
-            <input type="email" name="email" placeholder="Ваш Email для ответа" required>
+            <input type="email" name="email" placeholder="Ваш Email" required>
             <textarea name="message" rows="4" placeholder="Ваше сообщение..." required></textarea>
-            <button type="submit" class="btn-submit">ОТПРАВИТЬ</button>
+            <button type="submit" class="btn-main">ОТПРАВИТЬ СООБЩЕНИЕ</button>
         </form>
     </div>
 
-    <div class="map-section">
-        <iframe width="100%" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" 
-            src="https://www.openstreetmap.org/export/embed.html?bbox=28.7900,47.0320,28.8050,47.0390&layer=mapnik&marker=47.0356,28.7970">
-        </iframe>
+    <div class="map-box">
+        <h3 style="padding: 10px 15px; margin: 0; color: var(--brand-color);">Карта кладбища</h3>
+        <iframe width="100%" height="400" frameborder="0" src="https://www.openstreetmap.org/export/embed.html?bbox=28.7900,47.0320,28.8050,47.0390&layer=mapnik&marker=47.0356,28.7970"></iframe>
     </div>
 </div>
 
-<footer class="main-footer">
-    <div style="max-width: 600px; margin: 0 auto; font-size: 14px;">
-        <strong>Общественный реестр памяти</strong><br><br>
-        Данная информация является достоянием общества и принадлежит всем нам. <br>
-        © 2026 BSearch
-    </div>
+<footer class="footer">
+    <strong>Общественный реестр памяти</strong><br><br>
+    Данная информация является достоянием общества и принадлежит всем нам.<br>
+    © 2026 BSearch
 </footer>
 
 <script>
@@ -184,10 +162,52 @@
 
     async function performSearch() {
         const query = document.getElementById('searchInput').value.trim();
-        const status = document.getElementById('status');
         if (!query) return;
-
-        status.innerText = 'Поиск в архивах...';
-
+        document.getElementById('status').innerText = 'Ищем...';
+        
         try {
-            const { data,
+            const { data, error } = await _supabase.from('burials').select('*').ilike('full_name', `%${query}%`);
+            if (error || !data || data.length === 0) {
+                document.getElementById('status').innerText = 'Ничего не найдено.';
+                return;
+            }
+            dbResults = data;
+            render(data, query);
+            document.getElementById('searchArea').style.display = 'none';
+            document.getElementById('backBtn').style.display = 'block';
+            document.getElementById('resultsTable').style.display = 'table';
+        } catch (e) { console.error(e); }
+    }
+
+    function render(data, query = '') {
+        const tbody = document.getElementById('resultsBody');
+        tbody.innerHTML = '';
+        data.forEach(row => {
+            const hName = row.full_name.replace(new RegExp(`(${query})`, 'gi'), '<span class="highlight">$1</span>');
+            tbody.innerHTML += `<tr>
+                <td class="td-name" data-label="ФИО">${hName}</td>
+                <td data-label="Рождение">${row.birth_date || '-'}</td>
+                <td data-label="Смерть">${row.death_date || '-'}</td>
+                <td data-label="№ Могилы">${row.grave_number || '-'}</td>
+                <td data-label="Сектор">${row.sector || '-'}</td>
+            </tr>`;
+        });
+    }
+
+    function resetUI() {
+        document.getElementById('searchArea').style.display = 'block';
+        document.getElementById('backBtn').style.display = 'none';
+        document.getElementById('resultsTable').style.display = 'none';
+        document.getElementById('searchInput').value = '';
+    }
+
+    function sort(col) {
+        const sorted = [...dbResults].sort((a, b) => (a[col] || '').toString().localeCompare((b[col] || '').toString(), 'ru'));
+        render(sorted, document.getElementById('searchInput').value.trim());
+    }
+
+    document.getElementById('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(); });
+</script>
+
+</body>
+</html>
