@@ -2,46 +2,185 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM: BURIAL SEARCH ENGINE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Поиск захоронений | Мобильный реестр</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; line-height: 1.4; }
-        .container { max-width: 1200px; margin: auto; border: 1px solid #00ff41; padding: 20px; box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); }
-        h2 { border-bottom: 1px solid #00ff41; padding-bottom: 10px; margin-top: 0; letter-spacing: 2px; }
-        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        input { flex: 1; background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 12px; font-family: inherit; font-size: 16px; outline: none; }
-        button { background: #00ff41; color: #000; border: none; padding: 10px 25px; cursor: pointer; font-weight: bold; font-family: inherit; }
-        button:hover { background: #00cc33; }
-        .table-res { overflow-x: auto; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; border: 1px solid #00ff41; }
-        th, td { border: 1px solid #00ff41; padding: 12px; text-align: left; font-size: 14px; }
-        th { background: #003300; text-transform: uppercase; }
-        .map-link { color: #00ff41; text-decoration: underline; font-weight: bold; }
-        #status { margin-bottom: 10px; font-size: 0.9em; height: 1.5em; }
+        :root {
+            --primary: #2563eb;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #0f172a;
+            --secondary: #64748b;
+            --highlight: #fef08a;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; 
+            padding-bottom: 80px; /* Место для футера */
+        }
+
+        /* Шапка сайта */
+        .header {
+            background: var(--card);
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            text-align: center;
+        }
+
+        .header h1 { font-size: 1.2rem; margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+
+        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
+
+        /* Поисковая карточка */
+        .search-card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .search-box { display: flex; flex-direction: column; gap: 12px; }
+
+        input { 
+            padding: 16px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            outline: none;
+            -webkit-appearance: none; /* Убираем стандартные стили iOS */
+        }
+
+        input:focus { border-color: var(--primary); }
+
+        .btn-main { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 16px; 
+            border-radius: 12px; 
+            font-weight: bold; 
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Кнопка сброса */
+        .reset-container { display: none; margin-bottom: 15px; text-align: center; }
+        .btn-reset {
+            background: transparent;
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Адаптивная таблица / Карточки */
+        .results-container { margin-top: 10px; }
+
+        @media (max-width: 640px) {
+            table thead { display: none; } /* Скрываем шапку на мобильных */
+            table, tbody, tr, td { display: block; width: 100%; }
+            tr { 
+                background: var(--card); 
+                margin-bottom: 15px; 
+                border-radius: 16px; 
+                padding: 15px; 
+                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            }
+            td { 
+                padding: 8px 0; 
+                border: none; 
+                display: flex; 
+                justify-content: space-between; 
+                font-size: 15px;
+            }
+            td::before { 
+                content: attr(data-label); 
+                font-weight: 600; 
+                color: var(--secondary); 
+                font-size: 13px;
+                text-transform: uppercase;
+            }
+            .td-name { font-size: 18px; font-weight: bold; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 10px; display: block; }
+            .td-name::before { display: none; }
+        }
+
+        /* Стили для десктопа (оставляем таблицу) */
+        @media (min-width: 641px) {
+            table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
+            th { background: #f8fafc; padding: 15px; text-align: left; font-size: 12px; color: var(--secondary); cursor: pointer; border-bottom: 2px solid #e2e8f0; }
+            td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
+        }
+
+        .highlight { background: var(--highlight); font-weight: bold; padding: 0 2px; }
+        
+        .map-btn {
+            display: inline-block;
+            background: #f1f5f9;
+            color: var(--primary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Футер */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            font-size: 12px;
+            color: var(--secondary);
+            line-height: 1.5;
+        }
+
+        #status { font-size: 14px; color: var(--secondary); margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
+<div class="header">
+    <h1> Cemetery Search </h1>
+</div>
+
 <div class="container">
-    <h2>SYSTEM: BURIAL SEARCH ENGINE</h2>
-    <div id="status">READY...</div>
-    
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="ВВЕДИТЕ ФАМИЛИЮ (НАПР. ГЕРМАНСКИЙ)..." autocomplete="off">
-        <button onclick="search()">EXECUTE</button>
+    <div class="search-card" id="searchSection">
+        <div id="status">Введите фамилию для начала поиска</div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Напр: Германский" inputmode="search">
+            <button class="btn-main" onclick="search()">НАЙТИ ЧЕЛОВЕКА</button>
+        </div>
+    </div>
+
+    <div class="reset-container" id="resetBox">
+        <button class="btn-reset" onclick="resetSearch()">← Начать новый поиск</button>
     </div>
     
-    <div class="table-res">
-        <table>
+    <div class="results-container">
+        <table id="resultsTable">
             <thead>
                 <tr>
-                    <th>ФИО</th>
-                    <th>ДАТА РОЖД.</th>
-                    <th>ДАТА СМЕРТИ</th>
-                    <th>№ МОГИЛЫ</th>
-                    <th>СЕКТОР</th>
-                    <th>КАРТА</th>
+                    <th onclick="sortTable('full_name')">ФИО</th>
+                    <th onclick="sortTable('birth_date')">Рождение</th>
+                    <th onclick="sortTable('death_date')">Смерть</th>
+                    <th onclick="sortTable('grave_number')">Могила</th>
+                    <th onclick="sortTable('sector')">Сектор</th>
+                    <th>Карта</th>
                 </tr>
             </thead>
             <tbody id="resultsBody"></tbody>
@@ -49,29 +188,29 @@
     </div>
 </div>
 
+<footer class="footer">
+    <strong>Общественный реестр памяти</strong><br>
+    Данная информация является достоянием общества и принадлежит всем нам. <br>
+    История каждого человека — это часть нашей общей истории.
+</footer>
+
 <script>
-    // Конфигурация из ваших настроек
     const SUPABASE_URL = 'https://grqwgutmyakfagegqupy.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_SHiQs5LAw5FbDQpu6N3b1Q_bM_Ms1DI';
-    
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentData = [];
 
     async function search() {
         const query = document.getElementById('searchInput').value.trim();
         const status = document.getElementById('status');
         const tbody = document.getElementById('resultsBody');
         
-        if (!query) {
-            status.innerText = 'WARNING: EMPTY_QUERY';
-            return;
-        }
+        if (!query) return;
 
-        status.innerText = 'EXECUTING_SECURE_SEARCH...';
-        tbody.innerHTML = '';
-
+        status.innerText = '🔍 Ищем в архивах...';
+        
         try {
-            // Профессиональный подход: поиск через ilike по full_name
-            // Библиотека v2 автоматически кодирует кириллицу для предотвращения ошибок Headers
             const { data, error } = await _supabase
                 .from('burials')
                 .select('*')
@@ -80,34 +219,63 @@
             if (error) throw error;
 
             if (!data || data.length === 0) {
-                status.innerText = 'RESULT: NOT_FOUND';
+                status.innerText = '❌ Ничего не найдено';
                 return;
             }
 
-            status.innerText = `SUCCESS. RECORDS_FOUND: ${data.length}`;
+            currentData = data;
+            renderTable(data, query);
+            
+            // Плавное скрытие поиска и показ кнопки возврата
+            document.getElementById('searchSection').style.display = 'none';
+            document.getElementById('resetBox').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            data.forEach(item => {
-                // Генерация ссылки на карту по координатам
-                const mapCell = (item.latitude && item.longitude && item.latitude !== 'NULL') 
-                    ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="map-link">VIEW</a>`
-                    : '-';
-
-                tbody.innerHTML += `<tr>
-                    <td>${item.full_name || '-'}</td>
-                    <td>${item.birth_date || '-'}</td>
-                    <td>${item.death_date || '-'}</td>
-                    <td>${item.grave_number || '-'}</td>
-                    <td>${item.sector || '-'}</td>
-                    <td>${mapCell}</td>
-                </tr>`;
-            });
         } catch (err) {
-            console.error(err);
-            status.innerText = 'SYSTEM_ERROR: ' + err.message;
+            status.innerText = 'Ошибка: ' + err.message;
         }
     }
 
-    // Слушатель Enter
+    function renderTable(data, query = '') {
+        const tbody = document.getElementById('resultsBody');
+        tbody.innerHTML = '';
+
+        data.forEach(item => {
+            const mapCell = (item.latitude && item.longitude) 
+                ? `<a href="https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}" target="_blank" class="map-btn">📍 НА КАРТЕ</a>`
+                : '-';
+
+            const highlightedName = query ? 
+                item.full_name.replace(new RegExp(`(${query})`, 'gi'), '<span class="highlight">$1</span>') : 
+                item.full_name;
+
+            tbody.innerHTML += `
+                <tr>
+                    <td class="td-name" data-label="ФИО">${highlightedName}</td>
+                    <td data-label="Рождение">${item.birth_date || '-'}</td>
+                    <td data-label="Смерть">${item.death_date || '-'}</td>
+                    <td data-label="Могила">${item.grave_number || '-'}</td>
+                    <td data-label="Сектор">${item.sector || '-'}</td>
+                    <td data-label="Карта">${mapCell}</td>
+                </tr>`;
+        });
+    }
+
+    function resetSearch() {
+        document.getElementById('searchSection').style.display = 'block';
+        document.getElementById('resetBox').style.display = 'none';
+        document.getElementById('resultsBody').innerHTML = '';
+        document.getElementById('searchInput').value = '';
+        document.getElementById('status').innerText = 'Введите фамилию для начала поиска';
+    }
+
+    function sortTable(column) {
+        const sorted = [...currentData].sort((a, b) => 
+            (a[column] || '').toString().localeCompare((b[column] || '').toString(), 'ru')
+        );
+        renderTable(sorted, document.getElementById('searchInput').value.trim());
+    }
+
     document.getElementById('searchInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') search();
     });
