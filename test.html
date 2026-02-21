@@ -13,7 +13,7 @@
             --text-main: #1f2937;
             --text-muted: #6b7280;
             --border: #e5e7eb;
-            --ad-bg: #f8fafc;
+            --info-panel-bg: #eff6ff; /* Мягкий синий фон для инфо-блока */
         }
 
         body { 
@@ -37,22 +37,6 @@
 
         .container { max-width: 1000px; margin: -40px auto 40px; padding: 0 20px; position: relative; z-index: 3; }
 
-        /* Рекламный блок */
-        .ad-space {
-            background: var(--ad-bg);
-            border: 2px dashed #cbd5e1;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            padding: 20px;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 14px;
-            min-height: 90px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
         .search-card {
             background: white; padding: 30px; border-radius: 12px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid var(--border);
@@ -74,17 +58,29 @@
         th { background: #f9fafb; padding: 16px; text-align: left; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); cursor: pointer; }
         td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 15px; }
 
+        /* Специальный информационный блок (бывший рекламный) */
+        .info-panel {
+            background: var(--info-panel-bg);
+            border-radius: 12px;
+            margin: 40px 0 20px 0;
+            padding: 25px;
+            text-align: center;
+            color: var(--brand-color);
+            border: 1px solid #dbeafe;
+        }
+
         /* Карта */
         .map-section {
-            margin-top: 50px; background: white; border-radius: 12px;
+            background: white; border-radius: 12px;
             border: 1px solid var(--border); overflow: hidden; padding: 10px;
+            margin-bottom: 20px;
         }
         .map-section h3 { padding: 10px 15px; margin: 0; font-size: 1.1rem; color: var(--brand-color); }
         iframe { border-radius: 8px; }
 
         /* Мобильные правки */
         @media (max-width: 768px) {
-            body { font-weight: 500; } /* Усиление веса шрифта для мобильных */
+            body { font-weight: 500; }
             .hero-content h1 { font-size: 1.5rem; }
             .search-group { flex-direction: column; }
             .btn-search { padding: 16px; }
@@ -95,7 +91,7 @@
             td { 
                 display: flex; justify-content: center; align-items: center;
                 flex-direction: column; text-align: center; padding: 12px 0; 
-                border-bottom: 1px solid #f3f4f6; font-weight: 600; /* Жирный шрифт в карточках */
+                border-bottom: 1px solid #f3f4f6; font-weight: 600;
             }
             td::before { 
                 content: attr(data-label); font-size: 10px; color: var(--text-muted); 
@@ -123,10 +119,6 @@
 </div>
 
 <div class="container">
-    <div class="ad-space">
-        <div>Рекламный блок (МЕСТО ДЛЯ ВАШЕГО ОБЪЯВЛЕНИЯ)</div>
-    </div>
-
     <div class="search-card" id="searchArea">
         <div id="status" style="color: var(--text-muted); font-size: 14px; margin-bottom: 8px;">Система поиска активна</div>
         <div class="search-group">
@@ -151,23 +143,23 @@
         </table>
     </div>
 
+    <div class="info-panel">
+        <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 5px;">Помощь в сохранении памяти</div>
+        <div style="font-size: 15px;">Если вы обладаете уточняющей информацией или фотографиями, пожалуйста, свяжитесь с нами.</div>
+    </div>
+
     <div class="map-section">
         <h3>Общий план кладбища</h3>
         <iframe width="100%" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" 
             src="https://www.openstreetmap.org/export/embed.html?bbox=28.7900,47.0320,28.8050,47.0390&layer=mapnik&marker=47.0356,28.7970">
         </iframe>
-        <div style="padding: 10px; font-size: 12px; text-align: center;">
-            <a href="https://www.openstreetmap.org/#map=17/47.03562/28.79707" target="_blank" style="color: var(--accent-color);">Открыть на весь экран</a>
-        </div>
     </div>
 </div>
 
 <footer class="main-footer">
     <div style="max-width: 600px; margin: 0 auto; font-size: 14px;">
         <strong>Общественный реестр памяти</strong><br><br>
-        Данная информация является достоянием общества и принадлежит всем нам. 
-        Мы верим, что сохранение истории — это наша общая ответственность перед будущими поколениями.
-        <br><br>
+        Данная информация является достоянием общества и принадлежит всем нам. <br>
         © 2026 Кишиневское Еврейское Кладбище
     </div>
 </footer>
@@ -184,7 +176,7 @@
         const status = document.getElementById('status');
         if (!query) return;
 
-        status.innerText = 'Поиск в архивах...';
+        status.innerText = 'Синхронизация с архивом...';
 
         try {
             const { data, error } = await _supabase
