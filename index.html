@@ -3,8 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кишиневское Еврейское Кладбище | BSearch</title>
+    
+    <title>Кишиневское Еврейское Кладбище | Реестр захоронений BSearch</title>
+    <meta name="description" content="Официальный электронный реестр Кишиневского Еврейского Кладбища. Поиск захоронений, архивные данные, поиск предков и генеалогия. База данных BSearch.">
+    <meta name="keywords" content="Кишиневское еврейское кладбище, поиск захоронений Кишинев, реестр кладбищ Молдовы, BSearch, еврейские могилы Кишинев, генеалогия Молдова">
+    <meta name="robots" content="index, follow">
+    
+    <meta property="og:title" content="Кишиневское Еврейское Кладбище | Реестр BSearch">
+    <meta property="og:description" content="Электронный архив и поиск по реестру захоронений Кишиневского Еврейского Кладбища.">
+    <meta property="og:type" content="website">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Dataset",
+      "name": "Реестр Кишиневского Еврейского Кладбища",
+      "description": "База данных захоронений на территории Кишиневского Еврейского Кладбища.",
+      "creator": {
+        "@type": "Organization",
+        "name": "BSearch"
+      },
+      "license": "https://creativecommons.org/publicdomain/mark/1.0/"
+    }
+    </script>
+
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106945062', 'ym');
+        ym(106945062, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/106945062" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         :root {
             --brand-color: #1e3a8a;
@@ -20,7 +54,6 @@
             line-height: 1.6;
         }
 
-        /* Hero */
         .hero-section {
             position: relative; background: var(--brand-color); color: white;
             padding: 60px 20px; text-align: center;
@@ -31,10 +64,10 @@
             background-size: cover; background-position: center; opacity: 0.15; z-index: 1;
         }
         .hero-content { position: relative; z-index: 2; }
+        .hero-content h1 { font-size: 2.2rem; margin: 0 0 10px; font-weight: 700; }
 
         .container { max-width: 1000px; margin: -40px auto 40px; padding: 0 20px; position: relative; z-index: 3; }
 
-        /* Поиск */
         .search-card {
             background: white; padding: 30px; border-radius: 12px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid var(--border);
@@ -51,19 +84,16 @@
             padding: 16px 30px; border-radius: 8px; font-weight: 700; cursor: pointer;
         }
 
-        /* Таблица */
         .results-wrapper { margin-top: 30px; }
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
         th { background: #f9fafb; padding: 16px; text-align: left; font-size: 12px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border); cursor: pointer; }
         td { padding: 16px; border-bottom: 1px solid var(--border); }
 
-        /* Карта */
         .map-box {
             background: white; border-radius: 12px; border: 1px solid var(--border); 
             overflow: hidden; padding: 10px; margin-top: 30px;
         }
 
-        /* Форма обратной связи */
         .contact-box {
             background: white; border: 1px solid var(--border); border-radius: 12px;
             padding: 30px; margin: 30px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
@@ -71,7 +101,6 @@
         .contact-box h3 { margin-top: 0; color: var(--brand-color); font-size: 1.2rem; }
         .contact-form { display: grid; gap: 15px; }
 
-        /* Мобильная адаптация */
         @media (max-width: 768px) {
             body { font-weight: 500; }
             .search-group { flex-direction: column; }
@@ -95,59 +124,61 @@
 </head>
 <body>
 
-<div class="hero-section">
-    <div class="hero-bg"></div>
-    <div class="hero-content">
-        <h1>Кишиневское Еврейское Кладбище</h1>
-        <p>Электронный архив BSearch</p>
-    </div>
-</div>
-
-<div class="container">
-    <div class="search-card" id="searchArea">
-        <div id="status" style="font-size: 14px; color: var(--text-muted);">Введите фамилию для поиска в реестре:</div>
-        <div class="search-group">
-            <input type="text" id="searchInput" placeholder="Напр: Германский" inputmode="search">
-            <button class="btn-main" onclick="performSearch()">НАЙТИ</button>
+<main>
+    <header class="hero-section">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1>Кишиневское Еврейское Кладбище</h1>
+            <p>Электронный архив BSearch — Реестр памяти</p>
         </div>
-    </div>
+    </header>
 
-    <div class="results-wrapper">
-        <button onclick="resetUI()" id="backBtn" style="display:none; margin-bottom: 20px; padding: 10px 20px; cursor:pointer; font-weight:bold; border-radius:8px; border:1px solid var(--border);">← Новый поиск</button>
-        <table id="resultsTable" style="display: none;">
-            <thead>
-                <tr>
-                    <th onclick="sort('full_name')">ФИО</th>
-                    <th onclick="sort('birth_date')">Рождение</th>
-                    <th onclick="sort('death_date')">Смерть</th>
-                    <th onclick="sort('grave_number')">№ Могилы</th>
-                    <th onclick="sort('sector')">Сектор</th>
-                </tr>
-            </thead>
-            <tbody id="resultsBody"></tbody>
-        </table>
-    </div>
+    <div class="container">
+        <article class="search-card" id="searchArea">
+            <h2 id="status" style="font-size: 14px; color: var(--text-muted); margin: 0;">Поиск по фамилии в базе данных захоронений:</h2>
+            <div class="search-group">
+                <input type="text" id="searchInput" placeholder="Например: Германский" inputmode="search" aria-label="Поиск по фамилии">
+                <button class="btn-main" onclick="performSearch()">НАЙТИ</button>
+            </div>
+        </article>
 
-    <div class="map-box">
-        <h3 style="padding: 10px 15px; margin: 0; color: var(--brand-color); font-size: 1.1rem;">Карта кладбища</h3>
-        <iframe width="100%" height="400" frameborder="0" src="https://www.openstreetmap.org/export/embed.html?bbox=28.7900,47.0320,28.8050,47.0390&layer=mapnik&marker=47.0356,28.7970"></iframe>
-    </div>
+        <div class="results-wrapper">
+            <button onclick="resetUI()" id="backBtn" style="display:none; margin-bottom: 20px; padding: 10px 20px; cursor:pointer; font-weight:bold; border-radius:8px; border:1px solid var(--border);">← Новый поиск</button>
+            <table id="resultsTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th onclick="sort('full_name')">ФИО</th>
+                        <th onclick="sort('birth_date')">Рождение</th>
+                        <th onclick="sort('death_date')">Смерть</th>
+                        <th onclick="sort('grave_number')">№ Могилы</th>
+                        <th onclick="sort('sector')">Сектор</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody"></tbody>
+            </table>
+        </div>
 
-    <div class="contact-box">
-        <h3>Обратная связь</h3>
-        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px;">Заметили неточность или хотите дополнить данные? Напишите нам.</p>
-        <form action="https://formspree.io/f/xvzbwgzp" method="POST" class="contact-form">
-            <input type="email" name="email" placeholder="Ваш Email" required>
-            <textarea name="message" rows="4" placeholder="Ваше сообщение..." required></textarea>
-            <button type="submit" class="btn-main">ОТПРАВИТЬ</button>
-        </form>
+        <section class="map-box" aria-label="Интерактивная карта кладбища">
+            <h3 style="padding: 10px 15px; margin: 0; color: var(--brand-color); font-size: 1.1rem;">Интерактивная карта Кишиневского еврейского кладбища</h3>
+            <iframe width="100%" height="400" frameborder="0" title="Карта OpenStreetMap" src="https://www.openstreetmap.org/export/embed.html?bbox=28.7900,47.0320,28.8050,47.0390&layer=mapnik&marker=47.0356,28.7970"></iframe>
+        </section>
+
+        <section class="contact-box">
+            <h3>Обратная связь</h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px;">Заметили неточность в реестре или хотите дополнить архив? Напишите нам.</p>
+            <form action="https://formspree.io/f/xvzbwgzp" method="POST" class="contact-form">
+                <input type="email" name="email" placeholder="Ваш Email" required>
+                <textarea name="message" rows="4" placeholder="Ваше сообщение..." required></textarea>
+                <button type="submit" class="btn-main">ОТПРАВИТЬ СООБЩЕНИЕ</button>
+            </form>
+        </section>
     </div>
-</div>
+</main>
 
 <footer class="footer">
     <strong>Общественный реестр памяти</strong><br><br>
     Данная информация является достоянием общества и принадлежит всем нам.<br>
-    Ошибки возможны — поправьте нас.<br><br>
+    Ошибки в реестре возможны — поправьте нас.<br><br>
     © 2026 BSearch
 </footer>
 
@@ -161,12 +192,12 @@
     async function performSearch() {
         const query = document.getElementById('searchInput').value.trim();
         if (!query) return;
-        document.getElementById('status').innerText = 'Ищем...';
+        document.getElementById('status').innerText = 'Синхронизация с реестром...';
         
         try {
             const { data, error } = await _supabase.from('burials').select('*').ilike('full_name', `%${query}%`);
             if (error || !data || data.length === 0) {
-                document.getElementById('status').innerText = 'Ничего не найдено.';
+                document.getElementById('status').innerText = 'Записей не найдено. Попробуйте уточнить фамилию.';
                 return;
             }
             dbResults = data;
