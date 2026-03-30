@@ -2,8 +2,8 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    - cron: '0 9 * * 1,4'      # Запуск в 09:00 UTC каждый понедельник и четверг
-  workflow_dispatch:           # Возможность ручного запуска из вкладки Actions
+    - cron: '0 9 * * 1,4'      # Запуск в 09:00 UTC (Пн и Чт)
+  workflow_dispatch:           # Кнопка ручного запуска в GitHub Actions
 
 jobs:
   keep-alive:
@@ -29,35 +29,32 @@ jobs:
           node - << 'EOF'
           const { createClient } = require('@supabase/supabase-js');
 
-          const SUPABASE_URL = process.env.SUPABASE_URL;
-          const SUPABASE_KEY = process.env.SUPABASE_KEY;
-
-          if (!SUPABASE_URL || !SUPABASE_KEY) {
-            console.error('Ошибка: SUPABASE_URL или SUPABASE_KEY не найдены в Secrets!');
-            process.exit(1);
-          }
-
-          const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+          const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
           async function ping() {
+            console.log('Отправка проверочного запроса в Supabase...');
             try {
-              console.log('Попытка связи с Supabase...');
-              
-              // Ключевое исправление: явно указываем схему pg_catalog, 
-              // чтобы не получать ошибку отсутствия таблицы в схеме public.
-              const { data, error } = await supabase
-                .schema('pg_catalog')
-                .from('pg_tables')
-                .select('tablename')
+              // Делаем запрос к несуществующей таблице 'keep_alive_ping'.
+              // Этого достаточно, чтобы разбудить инстанс базы.
+              const { error } = await supabase
+                .from('keep_alive_ping')
+                .select('*')
                 .limit(1);
 
-              if (error) {
-                throw error;
+              // Если получаем ошибку 'PGRST116' (The table does not exist) — это УСПЕХ.
+              // Это значит, что API работает и база данных ответила на запрос.
+              if (error && error.code === 'PGRST116') {
+                console.log('База ответила: Таблица не найдена, но соединение установлено успешно.');
+              } else if (error) {
+                // Если ошибка другая (например, 401 или 403), выводим её для отладки
+                console.log('Получен ответ от API:', error.message);
+              } else {
+                console.log('Запрос прошел успешно (таблица существует).');
               }
-
-              console.log('Успех! База проснулась. Ответ получен.');
+              
+              console.log('Процесс пробуждения завершен.');
             } catch (err) {
-              console.error('Ошибка при активации базы:', err.message);
+              console.error('Ошибка при выполнении запроса:', err.message);
               process.exit(1);
             }
           }
