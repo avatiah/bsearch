@@ -1,0 +1,66 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    - cron: '0 9 * * 1,4'     # Запускается каждый понедельник и четверг в 9:00 UTC (два раза в неделю — достаточно)
+  workflow_dispatch:          # Можно запустить вручную из GitHub
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install @supabase/supabase-js
+
+      - name: Ping Supabase Database
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          node - << 'EOF'
+          const { createClient } = require('@supabase/supabase-js');
+
+          const SUPABASE_URL = process.env.SUPABASE_URL;
+          const SUPABASE_KEY = process.env.SUPABASE_KEY;
+
+          if (!SUPABASE_URL || !SUPABASE_KEY) {
+            console.error('Ошибка: SUPABASE_URL или SUPABASE_KEY не заданы');
+            process.exit(1);
+          }
+
+          const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+          async function ping() {
+            try {
+              // Простой запрос, который точно активирует базу
+              const { data, error } = await supabase
+                .from('pg_tables')           // системная таблица, всегда существует
+                .select('schemaname')
+                .limit(1);
+
+              if (error) {
+                console.error('Ошибка при пинге:', error.message);
+                // Попробуем альтернативный способ
+                const { data: altData, error: altError } = await supabase.rpc('version');
+                if (altError) throw altError;
+                console.log('База активирована через rpc(version)');
+              } else {
+                console.log('Supabase успешно пинганут. База активна.');
+              }
+            } catch (err) {
+              console.error('Не удалось активировать Supabase:', err.message);
+              process.exit(1);
+            }
+          }
+
+          ping();
+          EOF
