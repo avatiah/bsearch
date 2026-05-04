@@ -11,21 +11,25 @@
 
     <style>
         :root { --brand: #1e3a8a; --bg: #fcfcfd; --border: #e5e7eb; --success: #059669; }
-        body { margin: 0; font-family: "Inter", sans-serif; background: var(--bg); color: #1f2937; }
+        body { margin: 0; font-family: "Inter", sans-serif; background: var(--bg); color: #1f2937; transition: all 0.3s; }
         
+        .top-bar { display: flex; justify-content: flex-end; padding: 10px 20px; gap: 10px; background: #0f172a; }
+        .lang-btn { background: none; border: 1px solid #334155; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .lang-btn.active { background: var(--brand); border-color: var(--brand); }
+
         .hero { background: var(--brand); color: white; padding: 40px 20px; text-align: center; }
-        .container { max-width: 1000px; margin: -20px auto 40px; padding: 0 20px; }
+        .container { max-width: 1000px; margin: -20px auto 40px; padding: 0 20px; position: relative; z-index: 5; }
         
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: 1px solid var(--border); margin-bottom: 20px; }
         .search-group { display: flex; gap: 10px; margin-bottom: 15px; }
         input { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; outline: none; }
         
         .btn-main { background: var(--brand); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; }
         .btn-text { background: none; border: none; color: var(--brand); cursor: pointer; font-weight: 600; font-size: 13px; }
         
-        #map { height: 450px; border-radius: 12px; margin: 20px 0; border: 1px solid var(--border); z-index: 1; }
+        #map { height: 400px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); z-index: 1; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
         th { background: #f9fafb; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
         td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
@@ -43,42 +47,48 @@
 </head>
 <body>
 
+<div class="top-bar">
+    <button class="lang-btn active" onclick="setLang('ru')">RU</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('he')">עב</button>
+</div>
+
 <header class="hero">
-    <h1>Кишиневское Еврейское Кладбище</h1>
-    <p>Реестр захоронений и навигация по участкам</p>
+    <h1 id="t-title">Кишиневское Еврейское Кладбище</h1>
+    <p id="t-subtitle">Реестр захоронений и навигация</p>
 </header>
 
 <div class="container">
     <div class="card" id="searchBox">
         <div class="search-group">
             <input type="text" id="searchInput" placeholder="Введите фамилию">
-            <button class="btn-main" onclick="performSearch()">ПОИСК</button>
+            <button class="btn-main" id="t-search-btn" onclick="performSearch()">ПОИСК</button>
         </div>
         <div style="display:flex; justify-content: space-between;">
-            <button class="btn-text" onclick="toggleFilters()">⚙ Годы жизни</button>
-            <button class="btn-text" onclick="showFavorites()">⭐ Избранное (<span id="fav-count">0</span>)</button>
+            <button class="btn-text" id="t-filter-btn" onclick="toggleFilters()">⚙ Годы жизни</button>
+            <button class="btn-text" id="t-fav-btn" onclick="showFavorites()">⭐ Избранное (<span id="fav-count">0</span>)</button>
         </div>
         <div id="filterPanel" style="display:none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
-            <input type="number" id="yearFrom" placeholder="Год рождения от">
-            <input type="number" id="yearTo" placeholder="Год смерти до">
+            <input type="number" id="yearFrom" placeholder="От">
+            <input type="number" id="yearTo" placeholder="До">
         </div>
     </div>
 
-    <div id="resultsView" style="display:none; margin-top: 20px;">
+    <div id="resultsView" style="display:none;">
         <div style="margin-bottom: 15px; display: flex; gap: 10px;">
-            <button class="btn-main" onclick="location.reload()" style="background:#64748b;">← Назад</button>
-            <button class="btn-main" onclick="exportToPDF()" style="background:var(--success);">📄 Скачать PDF</button>
+            <button class="btn-main" id="t-back" onclick="location.reload()" style="background:#64748b;">← Назад</button>
+            <button class="btn-main" id="t-pdf" onclick="exportToPDF()" style="background:var(--success);">📄 PDF</button>
         </div>
         <div class="card" id="pdf-area">
             <table>
                 <thead>
-                    <tr>
-                        <th>ФИО</th>
-                        <th>Рождение</th>
-                        <th>Смерть</th>
-                        <th>Сектор</th>
-                        <th>№ Могилы</th>
-                        <th>Навигация</th>
+                    <tr id="table-head">
+                        <th id="h-fio">ФИО</th>
+                        <th id="h-b">Рождение</th>
+                        <th id="h-d">Смерть</th>
+                        <th id="h-s">Сектор</th>
+                        <th id="h-n">№ Могилы</th>
+                        <th id="h-m">Карта</th>
                     </tr>
                 </thead>
                 <tbody id="resultsBody"></tbody>
@@ -89,30 +99,56 @@
     <div id="map"></div>
 
     <div class="card">
-        <h3>Обратная связь</h3>
+        <h3 id="t-contact">Обратная связь</h3>
         <form action="https://formspree.io/f/xvzbwgzp" method="POST" style="display: grid; gap: 10px;">
-            <input type="email" name="email" placeholder="Ваш Email" required style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;">
-            <textarea name="message" placeholder="Уточнить данные или задать вопрос..." rows="3" style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;"></textarea>
-            <button type="submit" class="btn-main">ОТПРАВИТЬ</button>
+            <input type="email" name="email" placeholder="Email" required style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;">
+            <textarea name="message" id="t-msg-ph" placeholder="Ваше сообщение..." rows="3" style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;"></textarea>
+            <button type="submit" class="btn-main" id="t-send">ОТПРАВИТЬ</button>
         </form>
     </div>
 </div>
 
 <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPQWudyymuRTEaC9_FQYCyZFSoAp2P30Me_Th6dWDMHckiD6BnT3fQ9cfR4UreAlmxrujIb5aqKlJ/pub?gid=726531709&single=true&output=csv';
+    const cemeteryCenter = [47.0356, 28.7970];
     
-    // ВПИШИТЕ СЮДА ТОЧНЫЕ КООРДИНАТЫ ЦЕНТРОВ СЕКТОРОВ
-    const sectorCoords = {
-        "1": [47.0343, 28.7952],
-        "2": [47.0348, 28.7958],
-        "3": [47.0354, 28.7968],
-        "4": [47.0359, 28.7974],
-        "5": [47.0363, 28.7979],
-        "6": [47.0367, 28.7983],
-        "default": [47.0356, 28.7970]
+    // Сектора пока пустые до получения ваших данных
+    const sectorCoords = {};
+
+    const translations = {
+        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", m: "Карта", contact: "Обратная связь", send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено" },
+        en: { title: "Kishinev Jewish Cemetery", subtitle: "Burial Registry & Navigation", search: "SEARCH", filter: "⚙ Years of Life", fav: "⭐ Favorites", back: "← Back", pdf: "📄 Download PDF", fio: "Full Name", b: "Birth", d: "Death", s: "Sector", n: "Grave No.", m: "Map", contact: "Contact Us", send: "SEND", ph: "Enter last name", msg: "Your message...", alert: "Nothing found" },
+        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה וניווט", search: "חיפוש", filter: "⚙ שנות חיים", fav: "⭐ מועדפים", back: "← חזור", pdf: "📄 הורד PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", m: "מפה", contact: "צור קשר", send: "שלח", ph: "הזן שם משפחה", msg: "ההודעה שלך...", alert: "לא נמצאו תוצאות" }
     };
 
     const translitMap = {"a":"а","b":"б","v":"в","g":"г","d":"д","e":"е","yo":"ё","zh":"ж","z":"з","i":"и","j":"й","k":"к","l":"л","m":"м","n":"н","o":"о","p":"п","r":"р","s":"с","t":"т","u":"у","f":"ф","h":"х","ts":"ц","ch":"ч","sh":"ш","shch":"щ","y":"ы","yu":"ю","ya":"я"};
+    let currentLang = 'ru';
+    let allData = [];
+    let map, marker;
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.innerText.toLowerCase() === lang));
+        const t = translations[lang];
+        document.getElementById('t-title').innerText = t.title;
+        document.getElementById('t-subtitle').innerText = t.subtitle;
+        document.getElementById('t-search-btn').innerText = t.search;
+        document.getElementById('t-filter-btn').innerText = t.filter;
+        document.getElementById('t-fav-btn').innerHTML = `${t.fav} (<span id="fav-count">${JSON.parse(localStorage.getItem('bsearch_fav')||'[]').length}</span>)`;
+        document.getElementById('t-back').innerText = t.back;
+        document.getElementById('t-pdf').innerText = t.pdf;
+        document.getElementById('h-fio').innerText = t.fio;
+        document.getElementById('h-b').innerText = t.b;
+        document.getElementById('h-d').innerText = t.d;
+        document.getElementById('h-s').innerText = t.s;
+        document.getElementById('h-n').innerText = t.n;
+        document.getElementById('h-m').innerText = t.m;
+        document.getElementById('t-contact').innerText = t.contact;
+        document.getElementById('t-send').innerText = t.send;
+        document.getElementById('searchInput').placeholder = t.ph;
+        document.getElementById('t-msg-ph').placeholder = t.msg;
+        document.body.dir = lang === 'he' ? 'rtl' : 'ltr';
+    }
 
     function autoTranslit(text) {
         let output = text.toLowerCase();
@@ -121,53 +157,45 @@
         return output.split('').map(char => translitMap[char] || char).join('');
     }
 
-    let allData = [];
-    let map, marker;
-
     function initMap() {
-        map = L.map('map').setView(sectorCoords.default, 16);
+        map = L.map('map').setView(cemeteryCenter, 16);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(map);
-        marker = L.marker(sectorCoords.default).addTo(map).bindPopup("Кишиневское Еврейское Кладбище");
+        marker = L.marker(cemeteryCenter).addTo(map).bindPopup("Kishinev Cemetery");
     }
 
     async function loadData() {
-        try {
-            const res = await fetch(CSV_URL);
-            const text = await res.text();
-            allData = text.split('\n').slice(1).map(l => {
-                const cells = []; let cur = ''; let q = false;
-                for (let c of l) { if (c === '"') q = !q; else if (c === ',' && !q) { cells.push(cur.trim()); cur = ''; } else cur += c; }
-                cells.push(cur.trim()); return cells;
-            }).filter(r => r[1]);
-            
-            const urlId = new URLSearchParams(window.location.search).get('id');
-            if(urlId) {
-                const entry = allData.find(x => x[0] === urlId);
-                if(entry) renderResults([entry]);
-            }
-        } catch(e) { console.error("Data Load Error"); }
+        const res = await fetch(CSV_URL);
+        const text = await res.text();
+        allData = text.split('\n').slice(1).map(l => {
+            const cells = []; let cur = ''; let q = false;
+            for (let c of l) { if (c === '"') q = !q; else if (c === ',' && !q) { cells.push(cur.trim()); cur = ''; } else cur += c; }
+            cells.push(cur.trim()); return cells;
+        }).filter(r => r[1]);
+        
+        const urlId = new URLSearchParams(window.location.search).get('id');
+        if(urlId) {
+            const entry = allData.find(x => x[0] === urlId);
+            if(entry) renderResults([entry]);
+        }
     }
 
     function performSearch() {
         const val = document.getElementById('searchInput').value.trim().toLowerCase();
         const yF = parseInt(document.getElementById('yearFrom').value) || 0;
         const yT = parseInt(document.getElementById('yearTo').value) || 2050;
-        
         const query = /[a-z]/.test(val) ? autoTranslit(val) : val;
 
         const results = allData.filter(r => {
             const nameMatch = r[1].toLowerCase().includes(query);
-            // Поиск по точному номеру сектора (r[5])
             const sectorMatch = (r[5] && r[5].toLowerCase() === val);
             const b = parseInt(r[2]) || 0;
             const d = parseInt(r[3]) || 2050;
             const yearMatch = (b >= yF || yF === 0) && (d <= yT);
-            
             return (nameMatch || sectorMatch) && yearMatch;
         });
 
         if(results.length) renderResults(results);
-        else alert("Ничего не найдено");
+        else alert(translations[currentLang].alert);
     }
 
     function renderResults(data) {
@@ -175,17 +203,18 @@
         document.getElementById('resultsView').style.display = 'block';
         const tbody = document.getElementById('resultsBody');
         tbody.innerHTML = '';
+        const t = translations[currentLang];
 
         data.forEach(r => {
             tbody.innerHTML += `
                 <tr>
-                    <td data-label="ФИО"><b>${r[1]}</b></td>
-                    <td data-label="Рождение">${r[2]||'-'}</td>
-                    <td data-label="Смерть">${r[3]||'-'}</td>
-                    <td data-label="Сектор">${r[5]||'-'}</td>
-                    <td data-label="Могила">${r[4]||'-'}</td>
-                    <td data-label="Навигация">
-                        <button class="btn-map" onclick="focusSector('${r[5]}')">📍 Карта</button>
+                    <td data-label="${t.fio}"><b>${r[1]}</b></td>
+                    <td data-label="${t.b}">${r[2]||'-'}</td>
+                    <td data-label="${t.d}">${r[3]||'-'}</td>
+                    <td data-label="${t.s}">${r[5]||'-'}</td>
+                    <td data-label="${t.n}">${r[4]||'-'}</td>
+                    <td data-label="${t.m}">
+                        <button class="btn-map" onclick="focusSector('${r[5]}')">📍</button>
                         <button class="btn-share" onclick="copyLink('${r[0]}')">🔗</button>
                     </td>
                 </tr>`;
@@ -193,15 +222,16 @@
     }
 
     function focusSector(s) {
-        const coords = sectorCoords[s] || sectorCoords.default;
+        // Пока нет координат, просто показываем кладбище крупно
+        const coords = sectorCoords[s] || cemeteryCenter;
         map.flyTo(coords, 18);
-        marker.setLatLng(coords).setPopupContent(`<b>Сектор №${s}</b><br>Участок находится в этой области.`).openPopup();
+        marker.setLatLng(coords).setPopupContent(`Sector ${s}`).openPopup();
         document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
     }
 
     function copyLink(id) {
         const link = window.location.origin + window.location.pathname + "?id=" + id;
-        navigator.clipboard.writeText(link).then(() => alert("Ссылка скопирована"));
+        navigator.clipboard.writeText(link).then(() => alert("Link copied"));
     }
 
     function toggleFilters() {
@@ -211,10 +241,10 @@
 
     function exportToPDF() {
         const element = document.getElementById('pdf-area');
-        html2pdf().from(element).save('Cemetery_Search.pdf');
+        html2pdf().from(element).save('BSearch_Kishinev.pdf');
     }
 
-    window.onload = () => { initMap(); loadData(); };
+    window.onload = () => { initMap(); loadData(); setLang('ru'); };
 </script>
 </body>
 </html>
