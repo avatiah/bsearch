@@ -115,7 +115,7 @@
     const translations = {
         ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", actions: "Действия", contact: "Обратная связь", send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено", copy: "Копировать ссылку", copied: "Ссылка скопирована!" },
         en: { title: "Kishinev Jewish Cemetery", subtitle: "Burial Registry & Navigation", search: "SEARCH", filter: "⚙ Years of Life", fav: "⭐ Favorites", back: "← Back", pdf: "📄 Download PDF", fio: "Full Name", b: "Birth", d: "Death", s: "Sector", n: "Grave No.", actions: "Actions", contact: "Contact Us", send: "SEND", ph: "Enter last name", msg: "Your message...", alert: "Nothing found", copy: "Copy link", copied: "Link copied!" },
-        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה וניווט", search: "חיפוש", filter: "⚙ שנות חיים", fav: "⭐ מועדפים", back: "← חזור", pdf: "📄 הורד PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", actions: "פעולות", contact: "צור קשר", send: "שלח", ph: "הזן שם משפחה", msg: "ההודעה שלך...", alert: "לא נמצאו תוצאות", copy: "העתק קישור", copied: "הקישור הועתק!" }
+        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה и ניווט", search: "חיפוש", filter: "⚙ שנות חיים", fav: "⭐ מועדפים", back: "← חזור", pdf: "📄 הורד PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", actions: "פעולות", contact: "צור קשר", send: "שלח", ph: "הזן שם משפחה", msg: "ההודעה שלך...", alert: "לא נמצאו תוצאות", copy: "העתק קישור", copied: "הקישור הועתק!" }
     };
 
     const translitMap = {"a":"а","b":"б","v":"в","g":"г","d":"д","e":"е","yo":"ё","zh":"ж","z":"з","i":"и","j":"й","k":"к","l":"л","m":"м","n":"н","o":"о","p":"п","r":"р","s":"с","t":"т","u":"у","f":"ф","h":"х","ts":"ц","ch":"ч","sh":"ш","shch":"щ","y":"ы","yu":"ю","ya":"я"};
@@ -131,7 +131,6 @@
         document.getElementById('t-subtitle').innerText = t.subtitle;
         document.getElementById('t-search-btn').innerText = t.search;
         document.getElementById('t-filter-btn').innerText = t.filter;
-        document.getElementById('t-fav-btn').innerHTML = `${t.fav} (<span id="fav-count">${JSON.parse(localStorage.getItem('bsearch_fav')||'[]').length}</span>)`;
         document.getElementById('t-back').innerText = t.back;
         document.getElementById('t-pdf').innerText = t.pdf;
         document.getElementById('h-fio').innerText = t.fio;
@@ -161,19 +160,23 @@
     }
 
     async function loadData() {
-        const res = await fetch(CSV_URL);
-        const text = await res.text();
-        allData = text.split('\n').slice(1).map(l => {
-            const cells = []; let cur = ''; let q = false;
-            for (let c of l) { if (c === '"') q = !q; else if (c === ',' && !q) { cells.push(cur.trim()); cur = ''; } else cur += c; }
-            cells.push(cur.trim()); return cells;
-        }).filter(r => r[1]);
-        
-        const urlId = new URLSearchParams(window.location.search).get('id');
-        if(urlId) {
-            const entry = allData.find(x => x[0] === urlId);
-            if(entry) renderResults([entry]);
-        }
+        try {
+            const res = await fetch(CSV_URL);
+            const text = await res.text();
+            allData = text.split('\n').slice(1).map(l => {
+                const cells = []; let cur = ''; let q = false;
+                for (let c of l) { if (c === '"') q = !q; else if (c === ',' && !q) { cells.push(cur.trim()); cur = ''; } else cur += c; }
+                cells.push(cur.trim()); return cells;
+            }).filter(r => r[1]);
+            
+            const params = new URLSearchParams(window.location.search);
+            const urlId = params.get('id');
+            if(urlId) {
+                // Ищем по точному значению в первом столбце (ID)
+                const entry = allData.find(x => String(x[0]) === String(urlId));
+                if(entry) renderResults([entry]);
+            }
+        } catch(e) { console.error("Data load error"); }
     }
 
     function performSearch() {
@@ -218,7 +221,9 @@
     }
 
     function copyLink(id) {
-        const link = window.location.origin + window.location.pathname + "?id=" + id;
+        // Формируем чистую ссылку без дублирования параметров
+        const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+        const link = `${baseUrl}?id=${id}`;
         navigator.clipboard.writeText(link).then(() => alert(translations[currentLang].copied));
     }
 
