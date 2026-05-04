@@ -66,9 +66,8 @@
             <input type="text" id="searchInput" placeholder="Введите фамилию">
             <button class="btn-main" id="t-search-btn" onclick="performSearch()">ПОИСК</button>
         </div>
-        <div style="display:flex; justify-content: space-between;">
+        <div style="display:flex; justify-content: flex-start;">
             <button class="btn-text" id="t-filter-btn" onclick="toggleFilters()">⚙ Годы жизни</button>
-            <button class="btn-text" id="t-fav-btn" onclick="showFavorites()">⭐ Избранное (<span id="fav-count">0</span>)</button>
         </div>
         <div id="filterPanel" style="display:none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
             <input type="number" id="yearFrom" placeholder="От">
@@ -137,15 +136,15 @@
 
     const translations = {
         ru: { 
-            title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", contact: "Обратная связь", send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено",
+            title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", contact: "Обратная связь", send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено",
             infoTitle: "Информация о кладбище", iAddr: "Адрес и транспорт", iAddrVal: "ул. Милано, 1 (Буюканы). Троллейбусы: 1, 5, 8, 18, 23. Остановка «ул. Милано».", iHours: "Часы работы", iHoursVal: "Ежедневно: 08:00 – 17:00. Закрыто в Шаббат и праздники.", iAdmin: "Администрация", iAdminVal: "Комбинат ритуальных услуг г. Кишинева / Музей истории евреев РМ.", iRules: "Правила", iRulesVal: "Мужчинам рекомендуется головной убор. Соблюдайте тишину."
         },
         en: { 
-            title: "Kishinev Jewish Cemetery", subtitle: "Burial Registry & Navigation", search: "SEARCH", filter: "⚙ Years of Life", fav: "⭐ Favorites", back: "← Back", pdf: "📄 Download PDF", fio: "Full Name", b: "Birth", d: "Death", s: "Sector", n: "Grave No.", contact: "Contact Us", send: "SEND", ph: "Enter last name", msg: "Your message...", alert: "Nothing found",
+            title: "Kishinev Jewish Cemetery", subtitle: "Burial Registry & Navigation", search: "SEARCH", filter: "⚙ Years of Life", back: "← Back", pdf: "📄 Download PDF", fio: "Full Name", b: "Birth", d: "Death", s: "Sector", n: "Grave No.", contact: "Contact Us", send: "SEND", ph: "Enter last name", msg: "Your message...", alert: "Nothing found",
             infoTitle: "Cemetery Information", iAddr: "Address & Transport", iAddrVal: "1, Milano str. (Buiucani). Trolleys: 1, 5, 8, 18, 23. Stop: 'Milano str'.", iHours: "Opening Hours", iHoursVal: "Daily: 08:00 – 17:00. Closed on Shabbat and holidays.", iAdmin: "Management", iAdminVal: "Chisinau Ritual Services / Museum of Jewish History of Moldova.", iRules: "Visitor Rules", iRulesVal: "Head covering for men is recommended. Please maintain silence."
         },
         he: { 
-            title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה וניווט", search: "חיפוש", filter: "⚙ שנות חיים", fav: "⭐ מועדפים", back: "← חזור", pdf: "📄 הורד PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", contact: "צור קשר", send: "שלח", ph: "הזן שם משפחה", msg: "ההודעה שלך...", alert: "לא נמצאו תוצאות",
+            title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה וניווט", search: "חיפוש", filter: "⚙ שנות חיים", back: "← חזור", pdf: "📄 הורד PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", contact: "צור קשר", send: "שלח", ph: "הזן שם משפחה", msg: "ההודעה שלך...", alert: "לא נמצאו תוצאות",
             infoTitle: "מידע על בית העלמין", iAddr: "כתובת ותחבורה", iAddrVal: "רח' מילאנו 1 (בויקאני). טרוליבוס: 1, 5, 8, 18, 23. תחנה: 'רח' מילאנו'.", iHours: "שעות פעילות", iHoursVal: "כל יום: 08:00 – 17:00. סגור בשבתות ובחגים.", iAdmin: "ניהול", iAdminVal: "שירותי קבורה עירוניים קישינב / המוזיאון לתולדות יהודי מולדובה.", iRules: "כללי ביקור", iRulesVal: "מומלץ לגברים לחבוש כיסוי ראש. נא לשמור על השקט."
         }
     };
@@ -175,7 +174,6 @@
         document.getElementById('searchInput').placeholder = t.ph;
         document.getElementById('t-msg-ph').placeholder = t.msg;
         
-        // Info block translations
         document.getElementById('t-info-title').innerText = t.infoTitle;
         document.getElementById('t-i-addr').innerText = t.iAddr;
         document.getElementById('t-i-addr-val').innerText = t.iAddrVal;
