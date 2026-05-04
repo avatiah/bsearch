@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реестр захоронений | Кишиневское Еврейское Кладбище</title>
+    <style>
+        :root {
+            --brand-color: #1e3a8a;
+            --bg-main: #fcfcfd;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        body { 
+            margin: 0; padding: 0; background: var(--bg-main); 
+            color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            line-height: 1.6;
+        }
+
+        .hero-section {
+            background: var(--brand-color); color: white;
+            padding: 40px 20px; text-align: center;
+        }
+
+        .container { max-width: 1000px; margin: -30px auto 40px; padding: 0 20px; }
+
+        .search-card {
+            background: white; padding: 25px; border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border: 1px solid var(--border);
+        }
+
+        .search-group { display: flex; gap: 10px; margin-top: 15px; }
+
+        input { 
+            flex: 1; padding: 14px; border: 1px solid var(--border); 
+            border-radius: 8px; font-size: 16px; outline: none; width: 100%;
+        }
+
+        .btn-main { 
+            background: var(--brand-color); color: white; border: none;
+            padding: 14px 25px; border-radius: 8px; font-weight: bold; cursor: pointer;
+        }
+
+        .btn-main:disabled { background: #9ca3af; }
+
+        .results-wrapper { margin-top: 30px; }
+
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+        th { background: #f9fafb; padding: 12px; text-align: left; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 2px solid var(--border); cursor: pointer; }
+        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+
+        .highlight { background: #ffeb3b; font-weight: bold; padding: 0 2px; }
+
+        @media (max-width: 768px) {
+            .search-group { flex-direction: column; }
+            table thead { display: none; }
+            tr { display: block; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+            td { display: flex; justify-content: space-between; text-align: right; padding: 8px 0; border: none; }
+            td::before { content: attr(data-label); font-weight: bold; text-align: left; color: var(--text-muted); font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="hero-section">
+    <h1>Кишиневское Еврейское Кладбище</h1>
+    <p>Электронный реестр памяти</p>
+</header>
+
+<div class="container">
+    <div class="search-card">
+        <div id="status" style="font-size: 13px; color: var(--text-muted);">Загрузка базы данных...</div>
+        <div class="search-group">
+            <input type="text" id="searchInput" placeholder="Введите фамилию для поиска..." disabled>
+            <button class="btn-main" id="searchBtn" onclick="performSearch()" disabled>ПОИСК</button>
+        </div>
+    </div>
+
+    <div class="results-wrapper">
+        <button onclick="resetUI()" id="backBtn" style="display:none; margin-bottom: 15px; padding: 8px 15px; cursor:pointer;">← Назад к поиску</button>
+        
+        <table id="resultsTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th onclick="sortData(0)">ФИО</th>
+                    <th onclick="sortData(1)">Рождение</th>
+                    <th onclick="sortData(2)">Смерть</th>
+                    <th onclick="sortData(3)">Сектор</th>
+                    <th onclick="sortData(4)">№ Могилы</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPQWudyymuRTEaC9_FQYCyZFSoAp2P30Me_Th6dWDMHckiD6BnT3fQ9cfR4UreAlmxrujIb5aqKlJ/pub?gid=726531709&single=true&output=csv';
+
+    let allData = [];
+    let filteredData = [];
+
+    // Функция для корректного разделения CSV строки с учетом кавычек
+    function parseCSVLine(text) {
+        const result = [];
+        let cur = '';
+        let inQuote = false;
+        for (let char of text) {
+            if (char === '"') inQuote = !inQuote;
+            else if (char === ',' && !inQuote) {
+                result.push(cur.trim());
+                cur = '';
+            } else cur += char;
+        }
+        result.push(cur.trim());
+        return result;
+    }
+
+    async function init() {
+        try {
+            const response = await fetch(CSV_URL);
+            const text = await response.text();
+            const lines = text.split('\n').filter(l => l.trim() !== '');
+            
+            // Записываем данные (пропуская заголовок)
+            allData = lines.slice(1).map(line => parseCSVLine(line));
+
+            document.getElementById('status').innerText = `База данных готова. Записей: ${allData.length}`;
+            document.getElementById('searchInput').disabled = false;
+            document.getElementById('searchBtn').disabled = false;
+        } catch (e) {
+            document.getElementById('status').innerText = 'Ошибка доступа к данным. Проверьте публикацию таблицы.';
+        }
+    }
+
+    function performSearch() {
+        const query = document.getElementById('searchInput').value.trim().toLowerCase();
+        if (!query) return;
+
+        filteredData = allData.filter(row => 
+            row[0] && row[0].toLowerCase().includes(query)
+        );
+
+        if (filteredData.length === 0) {
+            alert('Ничего не найдено');
+            return;
+        }
+
+        render(filteredData, query);
+        document.getElementById('resultsTable').style.display = 'table';
+        document.getElementById('backBtn').style.display = 'block';
+    }
+
+    function render(data, highlight = '') {
+        const tbody = document.getElementById('resultsBody');
+        tbody.innerHTML = '';
+
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            const labels = ['ФИО', 'Рождение', 'Смерть', 'Сектор', '№ Могилы'];
+            
+            row.forEach((cell, index) => {
+                if (index > 4) return; // Ограничиваем количество колонок
+                const td = document.createElement('td');
+                td.setAttribute('data-label', labels[index]);
+                
+                let content = cell || '-';
+                if (index === 0 && highlight) {
+                    const regex = new RegExp(`(${highlight})`, 'gi');
+                    content = content.replace(regex, '<span class="highlight">$1</span>');
+                }
+                td.innerHTML = content;
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    }
+
+    function resetUI() {
+        document.getElementById('resultsTable').style.display = 'none';
+        document.getElementById('backBtn').style.display = 'none';
+        document.getElementById('searchInput').value = '';
+    }
+
+    function sortData(idx) {
+        filteredData.sort((a, b) => (a[idx] || '').localeCompare(b[idx] || '', 'ru'));
+        render(filteredData, document.getElementById('searchInput').value);
+    }
+
+    document.getElementById('searchInput').onkeypress = e => { if(e.key === 'Enter') performSearch(); };
+    
+    window.onload = init;
+</script>
+</body>
+</html>
