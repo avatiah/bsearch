@@ -50,9 +50,8 @@
 
 <div class="container">
     <div class="card" id="searchBox">
-        <div class="search-hint" id="status" style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Поиск на кириллице или латинице</div>
         <div class="search-group">
-            <input type="text" id="searchInput" placeholder="Введите фамилию или номер сектора...">
+            <input type="text" id="searchInput" placeholder="Введите фамилию">
             <button class="btn-main" onclick="performSearch()">ПОИСК</button>
         </div>
         <div style="display:flex; justify-content: space-between;">
@@ -102,15 +101,14 @@
 <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPQWudyymuRTEaC9_FQYCyZFSoAp2P30Me_Th6dWDMHckiD6BnT3fQ9cfR4UreAlmxrujIb5aqKlJ/pub?gid=726531709&single=true&output=csv';
     
-    // Координаты секторов (Lat, Lng) - Впишите точные данные здесь
+    // ВПИШИТЕ СЮДА ТОЧНЫЕ КООРДИНАТЫ ЦЕНТРОВ СЕКТОРОВ
     const sectorCoords = {
-        "1": [47.0345, 28.7955],
-        "2": [47.0350, 28.7960],
-        "3": [47.0355, 28.7970],
-        "4": [47.0360, 28.7975],
-        "5": [47.0365, 28.7980],
-        "6": [47.0368, 28.7985],
-        "7": [47.0370, 28.7990],
+        "1": [47.0343, 28.7952],
+        "2": [47.0348, 28.7958],
+        "3": [47.0354, 28.7968],
+        "4": [47.0359, 28.7974],
+        "5": [47.0363, 28.7979],
+        "6": [47.0367, 28.7983],
         "default": [47.0356, 28.7970]
     };
 
@@ -147,7 +145,7 @@
                 const entry = allData.find(x => x[0] === urlId);
                 if(entry) renderResults([entry]);
             }
-        } catch(e) { document.getElementById('status').innerText = "Ошибка загрузки данных"; }
+        } catch(e) { console.error("Data Load Error"); }
     }
 
     function performSearch() {
@@ -158,9 +156,9 @@
         const query = /[a-z]/.test(val) ? autoTranslit(val) : val;
 
         const results = allData.filter(r => {
-            // Поиск по ФИО (r[1]) или прямое совпадение по номеру Сектора (r[5])
             const nameMatch = r[1].toLowerCase().includes(query);
-            const sectorMatch = r[5] === val; // если ввели "12", найдет именно 12 сектор
+            // Поиск по точному номеру сектора (r[5])
+            const sectorMatch = (r[5] && r[5].toLowerCase() === val);
             const b = parseInt(r[2]) || 0;
             const d = parseInt(r[3]) || 2050;
             const yearMatch = (b >= yF || yF === 0) && (d <= yT);
@@ -213,7 +211,7 @@
 
     function exportToPDF() {
         const element = document.getElementById('pdf-area');
-        html2pdf().from(element).save('Cemetery_Registry.pdf');
+        html2pdf().from(element).save('Cemetery_Search.pdf');
     }
 
     window.onload = () => { initMap(); loadData(); };
