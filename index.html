@@ -33,9 +33,6 @@
         th { background: #f9fafb; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
         td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
-        .btn-share { background: #f3f4f6; border: 1px solid #e5e7eb; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; color: #4b5563; transition: 0.2s; }
-        .btn-share:hover { background: #e5e7eb; }
-
         @media (max-width: 768px) {
             .search-group { flex-direction: column; }
             th { display: none; }
@@ -88,7 +85,6 @@
                         <th id="h-d">Смерть</th>
                         <th id="h-s">Сектор</th>
                         <th id="h-n">№ Могилы</th>
-                        <th id="h-actions">Действия</th>
                     </tr>
                 </thead>
                 <tbody id="resultsBody"></tbody>
@@ -113,15 +109,15 @@
     const cemeteryCenter = [47.0356, 28.7970];
 
     const translations = {
-        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", actions: "Действия", contact: "Обратная связь", send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено", copy: "Копировать ссылку", copied: "Ссылка скопирована!" },
-        en: { title: "Kishinev Jewish Cemetery", subtitle: "Burial Registry & Navigation", search: "SEARCH", filter: "⚙ Years of Life", fav: "⭐ Favorites", back: "← Back", pdf: "📄 Download PDF", fio: "Full Name", b: "Birth", d: "Death", s: "Sector", n: "Grave No.", actions: "Actions", contact: "Contact Us", send: "SEND", ph: "Enter last name", msg: "Your message...", alert: "Nothing found", copy: "Copy link", copied: "Link copied!" },
-        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה и ניווט", search: "חיפוש", filter: "⚙ שנות חיים", fav: "⭐ מועדפים", back: "← חזור", pdf: "📄 הורד PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", actions: "פעולות", contact: "צור קשר", send: "שלח", ph: "הזן שם משפחה", msg: "ההודעה שלך...", alert: "לא נמצאו תוצאות", copy: "העתק קישור", copied: "הקישור הועתק!" }
+        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", contact: "Обратная связь", send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено" },
+        en: { title: "Kishinev Jewish Cemetery", subtitle: "Burial Registry & Navigation", search: "SEARCH", filter: "⚙ Years of Life", fav: "⭐ Favorites", back: "← Back", pdf: "📄 Download PDF", fio: "Full Name", b: "Birth", d: "Death", s: "Sector", n: "Grave No.", contact: "Contact Us", send: "SEND", ph: "Enter last name", msg: "Your message...", alert: "Nothing found" },
+        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה וניווט", search: "חיפוש", filter: "⚙ שנות חיים", fav: "⭐ מועדפים", back: "← חזור", pdf: "📄 הורד PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", contact: "צור קשר", send: "שלח", ph: "הזן שם משפחה", msg: "ההודעה שלך...", alert: "לא נמצאו תוצאות" }
     };
 
     const translitMap = {"a":"а","b":"б","v":"в","g":"г","d":"д","e":"е","yo":"ё","zh":"ж","z":"з","i":"и","j":"й","k":"к","l":"л","m":"м","n":"н","o":"о","p":"п","r":"р","s":"с","t":"т","u":"у","f":"ф","h":"х","ts":"ц","ch":"ч","sh":"ш","shch":"щ","y":"ы","yu":"ю","ya":"я"};
     let currentLang = 'ru';
     let allData = [];
-    let map, marker;
+    let map;
 
     function setLang(lang) {
         currentLang = lang;
@@ -138,7 +134,6 @@
         document.getElementById('h-d').innerText = t.d;
         document.getElementById('h-s').innerText = t.s;
         document.getElementById('h-n').innerText = t.n;
-        document.getElementById('h-actions').innerText = t.actions;
         document.getElementById('t-contact').innerText = t.contact;
         document.getElementById('t-send').innerText = t.send;
         document.getElementById('searchInput').placeholder = t.ph;
@@ -156,7 +151,7 @@
     function initMap() {
         map = L.map('map').setView(cemeteryCenter, 16);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(map);
-        marker = L.marker(cemeteryCenter).addTo(map).bindPopup("Kishinev Cemetery");
+        L.marker(cemeteryCenter).addTo(map).bindPopup("Kishinev Cemetery");
     }
 
     async function loadData() {
@@ -168,14 +163,6 @@
                 for (let c of l) { if (c === '"') q = !q; else if (c === ',' && !q) { cells.push(cur.trim()); cur = ''; } else cur += c; }
                 cells.push(cur.trim()); return cells;
             }).filter(r => r[1]);
-            
-            const params = new URLSearchParams(window.location.search);
-            const urlId = params.get('id');
-            if(urlId) {
-                // Ищем по точному значению в первом столбце (ID)
-                const entry = allData.find(x => String(x[0]) === String(urlId));
-                if(entry) renderResults([entry]);
-            }
         } catch(e) { console.error("Data load error"); }
     }
 
@@ -213,18 +200,8 @@
                     <td data-label="${t.d}">${r[3]||'-'}</td>
                     <td data-label="${t.s}">${r[5]||'-'}</td>
                     <td data-label="${t.n}">${r[4]||'-'}</td>
-                    <td data-label="${t.actions}">
-                        <button class="btn-share" onclick="copyLink('${r[0]}')">🔗 ${t.copy}</button>
-                    </td>
                 </tr>`;
         });
-    }
-
-    function copyLink(id) {
-        // Формируем чистую ссылку без дублирования параметров
-        const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
-        const link = `${baseUrl}?id=${id}`;
-        navigator.clipboard.writeText(link).then(() => alert(translations[currentLang].copied));
     }
 
     function toggleFilters() {
