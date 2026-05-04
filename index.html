@@ -34,6 +34,7 @@
         .hebrew { font-family: "SBL Hebrew", "Times New Roman", serif; font-size: 20px; text-align: right; direction: rtl; color: #000; line-height: 1.8; margin: 10px 0; }
         .translit { color: #475569; font-style: italic; font-size: 13px; margin-bottom: 5px; }
         .translate { color: #1e293b; font-size: 13px; background: #fff; padding: 8px; border-radius: 4px; border: 1px dashed #e2e8f0; }
+        .footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; margin-top: 20px; }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px; }
         .info-item h4 { margin: 0 0 5px 0; color: var(--brand); font-size: 14px; }
         .info-item p { margin: 0; font-size: 13px; line-height: 1.4; color: #4b5563; }
@@ -138,7 +139,7 @@
                     <div class="hebrew">יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ לְעָלַם וּלְעָלְמֵי עָלְמַיָּא. יִתְבָּרַךְ וְיִשְׁתַּבַּח וְיִתְפָּאַר וְיִתְרוֹמַם וְיִתְנַשֵּׂא וְיִתְהַדַּר וְיִתְעַלֶּה וְיִתְהַלָּל שְׁמֵהּ דְּקוּדְשָׁא בְּרִיךְ הוּא. לְעֵלָּא מִן כָּל בִּרְכָתָא וְשִׁירָתָא תֻּשְׁבְּחָתָא וְנֶחֱמָתָא דַּאֲמִירָן בְּעָלְמָא, וְאִמְרוּ אָמֵן.</div>
                     <div class="translit" id="t-trans-2"></div>
                     <div class="translate" id="t-kad-tr2"></div>
-                    <div class="hebrew">יְהֵא שְׁלָמָא רַבָּא מִן שְׁמַיָּא וְחַиִּים עָלֵינוּ и עַל כָּל יִשְׂרָאֵל, וְאִמְרוּ אָמֵן. עֹשֶׂה שָׁלוֹם בִּמְרוֹמָיו הוּא יַעֲשֶׂה שָׁלוֹם עָלֵינוּ וְעַל כָּל יִשְׂרָאֵל, וְאִמְרוּ אָמֵן.</div>
+                    <div class="hebrew">יְהֵא שְׁלָמָא רַבָּא מִן שְׁמַיָּא וְחַиִּים עָלֵינוּ и עַל כָּל יִשְׂרָאֵל, и אִמְרוּ אָמֵן. עֹשֶׂה שָׁלוֹם בִּמְרוֹמָיו הוּא יַעֲשֶׂה שָׁלוֹם עָלֵינוּ וְעַל כָּל יִשְׂרָאֵל, וְאִמְרוּ אָמֵן.</div>
                     <div class="translit" id="t-trans-3"></div>
                     <div class="translate" id="t-kad-tr3"></div>
                 </div>
@@ -155,6 +156,10 @@
             <textarea name="message" id="t-msg-ph" placeholder="Ваше сообщение..." rows="3" style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;"></textarea>
             <button type="submit" class="btn-main" id="t-send">ОТПРАВИТЬ</button>
         </form>
+    </div>
+
+    <div class="footer">
+        © 2026 BSearch | Общественный реестр памяти Кишинева
     </div>
 </div>
 
@@ -180,14 +185,14 @@
             send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено",
             infoTitle: "Информация о кладбище", iAddr: "Адрес", iAddrVal: "ул. Милано, 1 (Буюканы). Остановка «ул. Милано».", iHours: "Часы работы", iHoursVal: "08:00 – 17:00. Закрыто в Шаббат.",
             accHist: "История кладбища", accPray: "Традиции и молитвы",
-            histFull: `<p>Еврейское кладбище в Кишиневе на Буюканах было основано в XIX веке. Это один из крупнейших некрополей в Европе...</p><p><b>Погром 1903 года:</b> На территории находится братская могила жертв...</p>`,
+            histFull: `<p>Еврейское кладбище в Кишиневе на Буюканах было основано в XIX веке. Это один из крупнейших некрополей в Европе, сохранивший память о еврейской общине Бессарабии.</p><p><b>Погром 1903 года:</b> На территории находится братская могила жертв Кишиневского погрома. Мемориальные плиты хранят имена погибших. Также здесь расположен мемориал узникам гетто и жертвам Холокоста.</p><p><b>Бейт-Кадишим:</b> Ритуальный зал, построенный в 1913 году, является памятником государственного значения. Он использовался для прощания перед погребением.</p><p><b>Разрушение:</b> В 1960-е годы часть кладбища была разрушена советской властью под парк «Алунелул», корты и жилые кварталы.</p>`,
             kadIntro: "*Читается родственниками при наличии миньяна (10 мужчин).*",
-            trans1: "Итгадал вэиткадаш шмэй раба. Бэалма ди вра хирутэй...",
-            kadTr1: "Да возвысится и освятится Его великое имя...",
-            trans2: "Йеэй шмэй раба мэварах леалам...",
-            kadTr2: "Да будет имя Его великое благословенно вовеки...",
-            trans3: "Йеэй шлама раба мин шмайя...",
-            kadTr3: "Да будет ниспослан с небес мир нам...",
+            trans1: "Итгадал вэиткадаш шмэй раба. Бэалма ди вра хирутэй, вэямлих малхутэй бэхайейхон увэйомейхон увэхайей дэхоль бэйт исраэль, баагала увизман карив, вэимру амэн.",
+            kadTr1: "Да возвысится и освятится Его великое имя в мире, который Он сотворил по Своей воле...",
+            trans2: "Йеэй шмэй раба мэварах леалам улеалмэй алмаия. Итбарах вэйштабах вэйтпаар вэйтромам вэйтнасэ вэйтадар вэйталэ вэйталал шмэй дэкудша брих у...",
+            kadTr2: "Да будет имя Его великое благословенно вовеки и во веки веков. Да будет благословляемо и прославляемо имя Святого...",
+            trans3: "Йеэй шлама раба мин шмайя вэхайим алэйну вэал коль исраэль. Осэ шалом бимромав у яасэ шалом алэйну вэал коль исраэль, вэимру амэн.",
+            kadTr3: "Да будет ниспослан с небес мир нам и всему Израилю. Устанавливающий мир в Своих высотах, Он пошлет мир нам...",
             prayRules: "<b>Традиции:</b> На могилу принято класть камень вместо цветов. Мужчины покрывают голову. При выходе омывают руки."
         },
         en: { 
@@ -196,14 +201,14 @@
             send: "SEND", ph: "Last name", msg: "Message...", alert: "Not found",
             infoTitle: "General Info", iAddr: "Address", iAddrVal: "1 Milano St. (Buiucani).", iHours: "Hours", iHoursVal: "08:00 – 17:00. Closed on Shabbat.",
             accHist: "Cemetery History", accPray: "Traditions & Prayers",
-            histFull: `<p>Founded in the 19th century, it is one of Europe's largest Jewish necropolises.</p>`,
+            histFull: `<p>Founded in the 19th century, it is one of Europe's largest Jewish necropolises.</p><p><b>1903 Pogrom:</b> Contains a mass grave of the victims. Memorials for the Ghetto and Holocaust victims are also present.</p><p><b>Beit Kadishim:</b> The ritual hall built in 1913 is a national architectural monument.</p><p><b>Destruction:</b> Part of the site was demolished in the 1960s for "Alunelul" Park.</p>`,
             kadIntro: "*Recited by relatives with a minyan (10 men).*",
             trans1: "Yitgadal v’yitkadash sh’mei raba...",
-            kadTr1: "Exalted and hallowed be His great Name...",
+            kadTr1: "Exalted and hallowed be His great Name in the world which He created according to His will...",
             trans2: "Y’hei sh’mei raba m’varach l’alam...",
-            kadTr2: "May His great Name be blessed forever...",
+            kadTr2: "May His great Name be blessed forever. Blessed and praised be the Name of the Holy One...",
             trans3: "Y’hei shlama raba min sh’maya...",
-            kadTr3: "May there be abundant peace from heaven...",
+            kadTr3: "May there be abundant peace from heaven. He who creates peace in His heights, may He create peace for us...",
             prayRules: "<b>Traditions:</b> Place a stone on the grave. Men cover heads. Wash hands."
         },
         he: { 
@@ -212,14 +217,14 @@
             send: "שלח", ph: "שם משפחה", msg: "הודעה...", alert: "לא נמצא",
             infoTitle: "מידע כללי", iAddr: "כתובת", iAddrVal: "רח' מילאנו 1.", iHours: "שעות פעילות", iHoursVal: "08:00 – 17:00. סגור בשבת.",
             accHist: "היסטוריה של בית העלמין", accPray: "מסורות ותפילות",
-            histFull: `<p>הוקם במאה ה-19, אחד מבתי העלמין היהודיים הגדולים באירופה.</p>`,
+            histFull: `<p>הוקם במאה ה-19, אחד מבתי העלמין היהודיים הגדולים באירופה.</p><p><b>פוגרום 1903:</b> כולל קבר אחים לקורבנות הפוגרום.</p>`,
             kadIntro: "*נאמר על ידי קרובי משפחה בנוכחות מניין (10 גברים).*",
             trans1: "Yitgadal v’yitkadash sh’mei raba...",
-            kadTr1: "יתגדל ויתקדש שמו הגדול...",
+            kadTr1: "יתגדל ויתקדש שמו הגדול בעולם שברא כרצונו...",
             trans2: "Y’hei sh’mei raba m’varach l’alam...",
-            kadTr2: "יהא שמו הגדול מבורך לעולם...",
+            kadTr2: "יהא שמו הגדול מבורך לעולם ולעולמי עולמים...",
             trans3: "Y’hei shlama raba min sh’maya...",
-            kadTr3: "יהא שלום רב מן השמים...",
+            kadTr3: "יהא שלום רב מן השמים וחיים עלינו...",
             prayRules: "<b>מסורת:</b> נהוג להניח אבן על המצבה. גברים חובשים כיסוי ראש."
         }
     };
