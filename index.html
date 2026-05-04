@@ -50,9 +50,9 @@
 
 <div class="container">
     <div class="card" id="searchBox">
-        <div class="search-hint" style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Поиск работает на RU / EN / HE</div>
+        <div class="search-hint" id="status" style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Поиск на кириллице или латинице</div>
         <div class="search-group">
-            <input type="text" id="searchInput" placeholder="Введите фамилию...">
+            <input type="text" id="searchInput" placeholder="Введите фамилию или номер сектора...">
             <button class="btn-main" onclick="performSearch()">ПОИСК</button>
         </div>
         <div style="display:flex; justify-content: space-between;">
@@ -102,13 +102,15 @@
 <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPQWudyymuRTEaC9_FQYCyZFSoAp2P30Me_Th6dWDMHckiD6BnT3fQ9cfR4UreAlmxrujIb5aqKlJ/pub?gid=726531709&single=true&output=csv';
     
-    // Координаты секторов (добавьте точные Lat/Lng)
+    // Координаты секторов (Lat, Lng) - Впишите точные данные здесь
     const sectorCoords = {
         "1": [47.0345, 28.7955],
         "2": [47.0350, 28.7960],
         "3": [47.0355, 28.7970],
         "4": [47.0360, 28.7975],
         "5": [47.0365, 28.7980],
+        "6": [47.0368, 28.7985],
+        "7": [47.0370, 28.7990],
         "default": [47.0356, 28.7970]
     };
 
@@ -131,15 +133,21 @@
     }
 
     async function loadData() {
-        const res = await fetch(CSV_URL);
-        const text = await res.text();
-        allData = text.split('\n').slice(1).map(l => l.split(',')).filter(r => r[1]);
-        
-        const urlId = new URLSearchParams(window.location.search).get('id');
-        if(urlId) {
-            const entry = allData.find(x => x[0] === urlId);
-            if(entry) renderResults([entry]);
-        }
+        try {
+            const res = await fetch(CSV_URL);
+            const text = await res.text();
+            allData = text.split('\n').slice(1).map(l => {
+                const cells = []; let cur = ''; let q = false;
+                for (let c of l) { if (c === '"') q = !q; else if (c === ',' && !q) { cells.push(cur.trim()); cur = ''; } else cur += c; }
+                cells.push(cur.trim()); return cells;
+            }).filter(r => r[1]);
+            
+            const urlId = new URLSearchParams(window.location.search).get('id');
+            if(urlId) {
+                const entry = allData.find(x => x[0] === urlId);
+                if(entry) renderResults([entry]);
+            }
+        } catch(e) { document.getElementById('status').innerText = "Ошибка загрузки данных"; }
     }
 
     function performSearch() {
@@ -150,10 +158,14 @@
         const query = /[a-z]/.test(val) ? autoTranslit(val) : val;
 
         const results = allData.filter(r => {
+            // Поиск по ФИО (r[1]) или прямое совпадение по номеру Сектора (r[5])
             const nameMatch = r[1].toLowerCase().includes(query);
+            const sectorMatch = r[5] === val; // если ввели "12", найдет именно 12 сектор
             const b = parseInt(r[2]) || 0;
             const d = parseInt(r[3]) || 2050;
-            return nameMatch && (b >= yF || yF === 0) && (d <= yT);
+            const yearMatch = (b >= yF || yF === 0) && (d <= yT);
+            
+            return (nameMatch || sectorMatch) && yearMatch;
         });
 
         if(results.length) renderResults(results);
