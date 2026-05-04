@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BSearch | Kishinev Jewish Cemetery</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
@@ -17,22 +18,31 @@
             --success: #059669;
         }
 
-        body { margin: 0; padding: 0; background: var(--bg-main); color: var(--text-main); font-family: "Inter", sans-serif; line-height: 1.6; }
+        body { 
+            margin: 0; padding: 0; background: var(--bg-main); 
+            color: var(--text-main); font-family: "Inter", sans-serif; 
+            line-height: 1.6;
+        }
+
         .top-bar { display: flex; justify-content: flex-end; padding: 10px 20px; gap: 10px; background: #0f172a; }
         .lang-btn { background: none; border: 1px solid #334155; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
         .lang-btn.active { background: var(--brand-color); border-color: var(--brand-color); }
 
         .hero-section { position: relative; background: var(--brand-color); color: white; padding: 50px 20px; text-align: center; }
+        .hero-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url('https://images.unsplash.com/photo-1590059392135-cc04192667d4?q=80&w=2000&auto=format&fit=crop'); background-size: cover; background-position: center; opacity: 0.15; z-index: 1; }
+        .hero-content { position: relative; z-index: 2; }
+
         .container { max-width: 1000px; margin: -30px auto 40px; padding: 0 20px; position: relative; z-index: 3; }
 
         .search-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .search-hint { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; font-weight: 500; }
+        
         .search-group { display: flex; gap: 10px; margin-bottom: 15px; }
         input { flex: 1; padding: 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; outline: none; width: 100%; box-sizing: border-box; }
 
         .btn-main { background: var(--brand-color); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-weight: 700; cursor: pointer; }
         .btn-secondary { background: white; color: var(--text-main); border: 1px solid var(--border); padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .btn-share { background: #f3f4f6; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--brand-color); font-weight: bold; }
-        .btn-share:hover { background: #e5e7eb; }
 
         .results-wrapper { margin-top: 30px; }
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
@@ -41,14 +51,17 @@
         
         .fav-star { cursor: pointer; color: #d1d5db; font-size: 20px; transition: color 0.2s; }
         .fav-star.active { color: var(--gold); }
-        .no-pdf { width: 40px; text-align: center; }
+        
+        .map-box { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; padding: 10px; margin-top: 30px; }
+        .contact-box { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 30px; margin: 30px 0; }
+        .footer { padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 14px; border-top: 1px solid var(--border); background: white; }
 
         @media (max-width: 768px) {
             .search-group { flex-direction: column; }
             table thead { display: none; }
-            tr { display: block; border: 1px solid var(--border); margin-bottom: 15px; border-radius: 8px; padding: 10px; background: white; }
-            td { display: flex; justify-content: space-between; border: none; padding: 8px 0; text-align: right; }
-            td::before { content: attr(data-label); font-weight: 800; font-size: 10px; color: var(--text-muted); text-transform: uppercase; text-align: left; }
+            tr { display: block; background: white; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+            td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border: none; text-align: right; }
+            td::before { content: attr(data-label); font-weight: 800; font-size: 10px; color: var(--text-muted); text-transform: uppercase; text-align: left; margin-right: 10px; }
         }
     </style>
 </head>
@@ -61,25 +74,28 @@
 </div>
 
 <header class="hero-section">
-    <h1 id="t-title">Кишиневское Еврейское Кладбище</h1>
-    <p id="t-subtitle">Электронный реестр памяти</p>
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+        <h1 id="t-title">Кишиневское Еврейское Кладбище</h1>
+        <p id="t-subtitle">Электронный реестр памяти</p>
+    </div>
 </header>
 
 <div class="container">
     <div class="search-card" id="searchArea">
-        <div id="status" class="search-hint" style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">Поиск на кириллице или латинице</div>
+        <div id="status" class="search-hint">Загрузка данных...</div>
         <div class="search-group">
             <input type="text" id="searchInput" placeholder="Фамилия..." disabled>
             <button class="btn-main" id="searchBtn" onclick="performSearch()" disabled>ПОИСК</button>
         </div>
-        <div style="display:flex; justify-content: space-between;">
-            <button class="btn-text" style="background:none; border:none; color:var(--brand-color); cursor:pointer; font-weight:600;" onclick="showFavorites()">⭐ Избранное (<span id="fav-count">0</span>)</button>
-        </div>
+        <button class="btn-text" style="background:none; border:none; color:var(--brand-color); cursor:pointer; font-weight:600;" onclick="showFavorites()">
+            ⭐ Избранное (<span id="fav-count">0</span>)
+        </button>
     </div>
 
     <div class="results-wrapper" id="resultsWrapper" style="display:none;">
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button class="btn-secondary" onclick="resetUI()">← Назад</button>
+            <button class="btn-secondary" onclick="resetUI()" id="t-back">← Назад</button>
             <button class="btn-main" onclick="exportToPDF()" style="background:var(--success)">📄 Скачать PDF</button>
         </div>
         <div id="pdf-content">
@@ -92,20 +108,40 @@
                         <th id="t-col-d">Смерть</th>
                         <th id="t-col-s">Сектор</th>
                         <th id="t-col-n">№ Могилы</th>
-                        <th class="no-pdf">Поделиться</th>
+                        <th class="no-pdf">Связь</th>
                     </tr>
                 </thead>
                 <tbody id="resultsBody"></tbody>
             </table>
         </div>
     </div>
+
+    <section class="map-box">
+        <h3 id="t-map-title" style="padding: 10px 15px; margin: 0; color: var(--brand-color); font-size: 1.1rem;">Схема кладбища</h3>
+        <iframe width="100%" height="400" frameborder="0" src="https://www.openstreetmap.org/export/embed.html?bbox=28.7900,47.0320,28.8050,47.0390&layer=mapnik&marker=47.0356,28.7970"></iframe>
+    </section>
+
+    <section class="contact-box">
+        <h3 id="t-contact-title">Обратная связь</h3>
+        <p id="t-contact-hint" style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Сообщите об ошибке или пришлите координаты.</p>
+        <form action="https://formspree.io/f/xvzbwgzp" method="POST" style="display: grid; gap: 15px;">
+            <input type="email" name="email" placeholder="Email" required style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;">
+            <textarea name="message" rows="4" placeholder="Ваше сообщение..." required style="padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit;"></textarea>
+            <button type="submit" class="btn-main" id="t-send">ОТПРАВИТЬ</button>
+        </form>
+    </section>
 </div>
+
+<footer class="footer">
+    © 2026 BSearch | Kishinev Memorial Registry
+</footer>
 
 <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPQWudyymuRTEaC9_FQYCyZFSoAp2P30Me_Th6dWDMHckiD6BnT3fQ9cfR4UreAlmxrujIb5aqKlJ/pub?gid=726531709&single=true&output=csv';
     let allData = [];
     let currentView = [];
     let favorites = JSON.parse(localStorage.getItem('bsearch_favs') || '[]');
+    let currentLang = 'ru';
 
     const translitMap = {"a":"а","b":"б","v":"в","g":"г","d":"д","e":"е","yo":"ё","zh":"ж","z":"з","i":"и","j":"й","k":"к","l":"л","m":"м","n":"н","o":"о","p":"п","r":"р","s":"с","t":"т","u":"у","f":"ф","h":"х","ts":"ц","ch":"ч","sh":"ш","shch":"щ","y":"ы","yu":"ю","ya":"я"};
 
@@ -114,6 +150,32 @@
         const complex = ["shch","yo","zh","ts","ch","sh","yu","ya"];
         complex.forEach(c => { output = output.replace(new RegExp(c, "g"), translitMap[c]); });
         return output.split('').map(char => translitMap[char] || char).join('');
+    }
+
+    const translations = {
+        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Электронный реестр памяти", search: "ПОИСК", fav: "⭐ Избранное", back: "← Назад", colFio: "ФИО", colB: "Рождение", colD: "Смерть", colS: "Сектор", colN: "№ Могилы", loading: "Поиск на кириллице или латинице", map: "Схема кладбища", contact: "Обратная связь", hint: "Сообщите об ошибке или пришлите координаты.", send: "ОТПРАВИТЬ", link: "🔗 Ссылка" },
+        en: { title: "Kishinev Jewish Cemetery", subtitle: "Memorial Registry", search: "SEARCH", fav: "⭐ Favorites", back: "← Back", colFio: "Full Name", colB: "Birth", colD: "Death", colS: "Sector", colN: "Grave #", loading: "Search in Cyrillic or Latin", map: "Cemetery Map", contact: "Contact Us", hint: "Report errors or send coordinates.", send: "SEND", link: "🔗 Link" },
+        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר זיכרון אלקטרוני", search: "חיפוש", fav: "⭐ מועדפים", back: "← חזור", colFio: "שם מלא", colB: "לידה", colD: "פטירה", colS: "חלקה", colN: "קבר מס'", loading: "חיפוש בקירילית או לטינית", map: "מפת בית העלמין", contact: "צור קשר", hint: "דווח על טעויות או שלח קואורדינטות", send: "שלח", link: "🔗 קישור" }
+    };
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.innerText.toLowerCase() === lang));
+        const t = translations[lang];
+        document.getElementById('t-title').innerText = t.title;
+        document.getElementById('t-subtitle').innerText = t.subtitle;
+        document.getElementById('searchBtn').innerText = t.search;
+        document.getElementById('t-back').innerText = t.back;
+        document.getElementById('status').innerText = t.loading;
+        document.querySelectorAll('#resultsTable th').forEach((th, i) => { 
+            const labels = ["", t.colFio, t.colB, t.colD, t.colS, t.colN, ""];
+            if(labels[i]) th.innerText = labels[i];
+        });
+        document.getElementById('t-map-title').innerText = t.map;
+        document.getElementById('t-contact-title').innerText = t.contact;
+        document.getElementById('t-contact-hint').innerText = t.hint;
+        document.getElementById('t-send').innerText = t.send;
+        document.body.dir = lang === 'he' ? 'rtl' : 'ltr';
     }
 
     async function init() {
@@ -126,18 +188,18 @@
                 cells.push(cur.trim()); return cells;
             }).filter(r => r[1]);
 
+            document.getElementById('status').innerText = translations[currentLang].loading;
             document.getElementById('searchInput').disabled = false;
             document.getElementById('searchBtn').disabled = false;
             updateFavCount();
 
-            // ПРОВЕРКА DEEP LINK (запуск если в URL есть ?id=...)
             const urlParams = new URLSearchParams(window.location.search);
             const sharedId = urlParams.get('id');
             if (sharedId) {
                 const record = allData.find(r => r[0] === sharedId);
                 if (record) render([record]);
             }
-        } catch (e) { console.error("Data error", e); }
+        } catch (e) { document.getElementById('status').innerText = "Data error"; }
     }
 
     function performSearch() {
@@ -156,24 +218,22 @@
             const isFav = favorites.some(f => f[0] === row[0]);
             tbody.innerHTML += `<tr>
                 <td class="no-pdf"><span class="fav-star ${isFav?'active':''}" onclick="toggleFav('${row[0]}')">★</span></td>
-                <td data-label="ФИО">${row[1]}</td>
-                <td data-label="Рождение">${row[2]||'-'}</td>
-                <td data-label="Смерть">${row[3]||'-'}</td>
-                <td data-label="Сектор">${row[5]||'-'}</td>
-                <td data-label="Могила">${row[4]||'-'}</td>
-                <td class="no-pdf"><button class="btn-share" onclick="copyShareLink('${row[0]}')">🔗 Ссылка</button></td>
+                <td data-label="${translations[currentLang].colFio}">${row[1]}</td>
+                <td data-label="${translations[currentLang].colB}">${row[2]||'-'}</td>
+                <td data-label="${translations[currentLang].colD}">${row[3]||'-'}</td>
+                <td data-label="${translations[currentLang].colS}">${row[5]||'-'}</td>
+                <td data-label="${translations[currentLang].colN}">${row[4]||'-'}</td>
+                <td class="no-pdf"><button class="btn-share" onclick="copyShareLink('${row[0]}')">${translations[currentLang].link}</button></td>
             </tr>`;
         });
         document.getElementById('searchArea').style.display = 'none';
         document.getElementById('resultsWrapper').style.display = 'block';
+        window.scrollTo(0,0);
     }
 
     function copyShareLink(id) {
-        const base = window.location.origin + window.location.pathname;
-        const link = `${base}?id=${id}`;
-        navigator.clipboard.writeText(link).then(() => {
-            alert("Ссылка скопирована! Отправьте её родственникам.");
-        });
+        const link = `${window.location.origin}${window.location.pathname}?id=${id}`;
+        navigator.clipboard.writeText(link).then(() => alert("Ссылка скопирована!"));
     }
 
     function toggleFav(id) {
@@ -186,8 +246,8 @@
     }
 
     function showFavorites() {
-        if (favorites.length === 0) return alert("Список пуст");
-        currentView = []; // сбрасываем поиск при просмотре избранного
+        if (favorites.length === 0) return alert("Пусто");
+        currentView = [];
         render(favorites);
     }
 
@@ -195,7 +255,6 @@
     function resetUI() { 
         document.getElementById('searchArea').style.display = 'block'; 
         document.getElementById('resultsWrapper').style.display = 'none';
-        // Очищаем URL при возврате к поиску
         window.history.replaceState({}, '', window.location.pathname);
     }
 
@@ -203,10 +262,11 @@
         const element = document.getElementById('pdf-content');
         const hidden = document.querySelectorAll('.no-pdf');
         hidden.forEach(s => s.style.display = 'none');
-        html2pdf().set({ margin: 10, filename: 'Registry.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4' } })
+        html2pdf().set({ margin: 10, filename: 'BSearch.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4' } })
                  .from(element).save().then(() => hidden.forEach(s => s.style.display = ''));
     }
 
+    document.getElementById('searchInput').onkeypress = e => { if(e.key === 'Enter') performSearch(); };
     window.onload = init;
 </script>
 </body>
