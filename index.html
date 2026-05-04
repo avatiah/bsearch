@@ -33,8 +33,10 @@
         th { background: #f9fafb; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
         td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
-        .btn-map { background: #eff6ff; color: var(--brand); border: 1px solid #dbeafe; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; }
-        .btn-share { background: #f3f4f6; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .btn-map { background: #eff6ff; color: var(--brand); border: 1px solid #dbeafe; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .btn-map:hover { background: #dbeafe; }
+        .btn-share { background: #f3f4f6; border: 1px solid #e5e7eb; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; color: #4b5563; }
+        .btn-share:hover { background: #e5e7eb; }
 
         @media (max-width: 768px) {
             .search-group { flex-direction: column; }
@@ -42,6 +44,7 @@
             td { display: flex; justify-content: space-between; border: none; padding: 8px 0; align-items: center; }
             td::before { content: attr(data-label); font-weight: 700; color: #6b7280; font-size: 11px; }
             tr { display: block; border-bottom: 2px solid var(--border); padding: 10px 0; }
+            .action-cell { flex-direction: row; gap: 8px; }
         }
     </style>
 </head>
@@ -88,7 +91,7 @@
                         <th id="h-d">Смерть</th>
                         <th id="h-s">Сектор</th>
                         <th id="h-n">№ Могилы</th>
-                        <th id="h-m">Карта</th>
+                        <th id="h-actions">Действия</th>
                     </tr>
                 </thead>
                 <tbody id="resultsBody"></tbody>
@@ -111,14 +114,12 @@
 <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPQWudyymuRTEaC9_FQYCyZFSoAp2P30Me_Th6dWDMHckiD6BnT3fQ9cfR4UreAlmxrujIb5aqKlJ/pub?gid=726531709&single=true&output=csv';
     const cemeteryCenter = [47.0356, 28.7970];
-    
-    // Сектора пока пустые до получения ваших данных
     const sectorCoords = {};
 
     const translations = {
-        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", m: "Карта", contact: "Обратная связь", send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено" },
-        en: { title: "Kishinev Jewish Cemetery", subtitle: "Burial Registry & Navigation", search: "SEARCH", filter: "⚙ Years of Life", fav: "⭐ Favorites", back: "← Back", pdf: "📄 Download PDF", fio: "Full Name", b: "Birth", d: "Death", s: "Sector", n: "Grave No.", m: "Map", contact: "Contact Us", send: "SEND", ph: "Enter last name", msg: "Your message...", alert: "Nothing found" },
-        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה וניווט", search: "חיפוש", filter: "⚙ שנות חיים", fav: "⭐ מועדפים", back: "← חזור", pdf: "📄 הורד PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", m: "מפה", contact: "צור קשר", send: "שלח", ph: "הזן שם משפחה", msg: "ההודעה שלך...", alert: "לא נמצאו תוצאות" }
+        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", actions: "Действия", contact: "Обратная связь", send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено", copy: "Копировать ссылку", copied: "Ссылка скопирована!" },
+        en: { title: "Kishinev Jewish Cemetery", subtitle: "Burial Registry & Navigation", search: "SEARCH", filter: "⚙ Years of Life", fav: "⭐ Favorites", back: "← Back", pdf: "📄 Download PDF", fio: "Full Name", b: "Birth", d: "Death", s: "Sector", n: "Grave No.", actions: "Actions", contact: "Contact Us", send: "SEND", ph: "Enter last name", msg: "Your message...", alert: "Nothing found", copy: "Copy link", copied: "Link copied!" },
+        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה וניווט", search: "חיפוש", filter: "⚙ שנות חיים", fav: "⭐ מועדפים", back: "← חזור", pdf: "📄 הורד PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", actions: "פעולות", contact: "צור קשר", send: "שלח", ph: "הזן שם משפחה", msg: "ההודעה שלך...", alert: "לא נמצאו תוצאות", copy: "העתק קישור", copied: "הקישור הועתק!" }
     };
 
     const translitMap = {"a":"а","b":"б","v":"в","g":"г","d":"д","e":"е","yo":"ё","zh":"ж","z":"з","i":"и","j":"й","k":"к","l":"л","m":"м","n":"н","o":"о","p":"п","r":"р","s":"с","t":"т","u":"у","f":"ф","h":"х","ts":"ц","ch":"ч","sh":"ш","shch":"щ","y":"ы","yu":"ю","ya":"я"};
@@ -142,7 +143,7 @@
         document.getElementById('h-d').innerText = t.d;
         document.getElementById('h-s').innerText = t.s;
         document.getElementById('h-n').innerText = t.n;
-        document.getElementById('h-m').innerText = t.m;
+        document.getElementById('h-actions').innerText = t.actions;
         document.getElementById('t-contact').innerText = t.contact;
         document.getElementById('t-send').innerText = t.send;
         document.getElementById('searchInput').placeholder = t.ph;
@@ -213,25 +214,24 @@
                     <td data-label="${t.d}">${r[3]||'-'}</td>
                     <td data-label="${t.s}">${r[5]||'-'}</td>
                     <td data-label="${t.n}">${r[4]||'-'}</td>
-                    <td data-label="${t.m}">
-                        <button class="btn-map" onclick="focusSector('${r[5]}')">📍</button>
-                        <button class="btn-share" onclick="copyLink('${r[0]}')">🔗</button>
+                    <td data-label="${t.actions}" class="action-cell">
+                        <button class="btn-map" onclick="focusSector('${r[5]}')" title="${t.m}">📍</button>
+                        <button class="btn-share" onclick="copyLink('${r[0]}')">🔗 ${t.copy}</button>
                     </td>
                 </tr>`;
         });
     }
 
     function focusSector(s) {
-        // Пока нет координат, просто показываем кладбище крупно
         const coords = sectorCoords[s] || cemeteryCenter;
         map.flyTo(coords, 18);
-        marker.setLatLng(coords).setPopupContent(`Sector ${s}`).openPopup();
+        marker.setLatLng(coords).setPopupContent(s ? `Sector ${s}` : "Cemetery").openPopup();
         document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
     }
 
     function copyLink(id) {
         const link = window.location.origin + window.location.pathname + "?id=" + id;
-        navigator.clipboard.writeText(link).then(() => alert("Link copied"));
+        navigator.clipboard.writeText(link).then(() => alert(translations[currentLang].copied));
     }
 
     function toggleFilters() {
