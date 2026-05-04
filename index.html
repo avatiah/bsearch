@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BSearch | Kishinev Jewish Cemetery</title>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         :root {
@@ -50,7 +49,7 @@
 
         .results-wrapper { margin-top: 30px; }
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-        th { background: #f9fafb; padding: 15px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border); cursor: pointer; }
+        th { background: #f9fafb; padding: 15px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border); }
         td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
         
         .fav-star { cursor: pointer; color: #d1d5db; font-size: 20px; transition: color 0.2s; }
@@ -102,30 +101,32 @@
         </div>
         
         <div id="filtersPanel" class="filters-panel">
-            <input type="number" id="yearFrom" placeholder="Год от (напр. 1890)">
-            <input type="number" id="yearTo" placeholder="Год до (напр. 1960)">
+            <input type="number" id="yearFrom" placeholder="Год рождения от">
+            <input type="number" id="yearTo" placeholder="Год смерти до">
         </div>
     </div>
 
     <div class="results-wrapper" id="resultsWrapper" style="display:none;">
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
             <button class="btn-secondary" onclick="resetUI()" id="t-back">← Назад</button>
-            <button class="btn-main" onclick="exportToPDF()" style="background:#059669">📄 PDF</button>
+            <button class="btn-main" onclick="exportToPDF()" style="background:#059669">📄 Скачать PDF</button>
         </div>
         
-        <table id="resultsTable">
-            <thead>
-                <tr>
-                    <th>⭐</th>
-                    <th id="t-col-fio">ФИО</th>
-                    <th id="t-col-b">Рождение</th>
-                    <th id="t-col-d">Смерть</th>
-                    <th id="t-col-s">Сектор</th>
-                    <th id="t-col-n">№ Могилы</th>
-                </tr>
-            </thead>
-            <tbody id="resultsBody"></tbody>
-        </table>
+        <div id="pdf-content">
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th class="no-pdf">⭐</th>
+                        <th id="t-col-fio">ФИО</th>
+                        <th id="t-col-b">Рождение</th>
+                        <th id="t-col-d">Смерть</th>
+                        <th id="t-col-s">Сектор</th>
+                        <th id="t-col-n">№ Могилы</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody"></tbody>
+            </table>
+        </div>
     </div>
 
     <section class="map-box">
@@ -157,7 +158,7 @@
     let currentLang = 'ru';
 
     const translations = {
-        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Электронный реестр памяти", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", colFio: "ФИО", colB: "Рождение", colD: "Смерть", colS: "Сектор", colN: "№ Могилы", loading: "Введите фамилию для поиска (можно латиницей)", map: "Схема кладбища", contact: "Обратная связь", hint: "Сообщите нам о неточностях.", send: "ОТПРАВИТЬ" },
+        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Электронный реестр памяти", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", colFio: "ФИО", colB: "Рождение", colD: "Смерть", colS: "Сектор", colN: "№ Могилы", loading: "Введите фамилию для поиска. Можно латиницей.", map: "Схема кладбища", contact: "Обратная связь", hint: "Сообщите нам о неточностях.", send: "ОТПРАВИТЬ" },
         en: { title: "Kishinev Jewish Cemetery", subtitle: "Memorial Registry", search: "SEARCH", filter: "⚙ Year Filter", fav: "⭐ Favorites", back: "← Back", colFio: "Full Name", colB: "Birth", colD: "Death", colS: "Sector", colN: "Grave #", loading: "Enter name to search (Latin or Cyrillic)", map: "Cemetery Map", contact: "Contact Us", hint: "Report errors or additions.", send: "SEND" },
         he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר זיכרון אלקטרוני", search: "חיפוש", filter: "⚙ פילטר שנים", fav: "⭐ מועדפים", back: "← חזור", colFio: "שם מלא", colB: "לידה", colD: "פטירה", colS: "חלקה", colN: "קבר מס'", loading: "הזינו שם לחיפוש", map: "מפת בית העלמין", contact: "צור קשר", hint: "דווח על טעויות או הוסף מידע", send: "שלח" }
     };
@@ -193,7 +194,7 @@
             document.getElementById('searchInput').disabled = false;
             document.getElementById('searchBtn').disabled = false;
             updateFavCount();
-        } catch (e) { document.getElementById('status').innerText = "Load error"; }
+        } catch (e) { document.getElementById('status').innerText = "Ошибка загрузки данных."; }
     }
 
     function performSearch() {
@@ -203,7 +204,7 @@
         if(!q) return;
 
         currentView = allData.filter(r => r[1].toLowerCase().includes(q) && (parseInt(r[2]) >= yF || yF === 0) && (parseInt(r[3]) <= yT));
-        if (currentView.length === 0) return alert("Nothing found");
+        if (currentView.length === 0) return alert("Ничего не найдено");
         render(currentView, q);
     }
 
@@ -216,7 +217,7 @@
             if(highlight) name = name.replace(new RegExp(`(${highlight})`, 'gi'), '<span class="highlight">$1</span>');
             
             tbody.innerHTML += `<tr>
-                <td><span class="fav-star ${isFav?'active':''}" onclick="toggleFav('${row[0]}')">★</span></td>
+                <td class="no-pdf"><span class="fav-star ${isFav?'active':''}" onclick="toggleFav('${row[0]}')">★</span></td>
                 <td data-label="${translations[currentLang].colFio}">${name}</td>
                 <td data-label="${translations[currentLang].colB}">${row[2]||'-'}</td>
                 <td data-label="${translations[currentLang].colD}">${row[3]||'-'}</td>
@@ -229,6 +230,27 @@
         window.scrollTo(0,0);
     }
 
+    function exportToPDF() {
+        const element = document.getElementById('pdf-content');
+        
+        // Временно скрываем колонку со звездочками для PDF
+        const stars = document.querySelectorAll('.no-pdf');
+        stars.forEach(s => s.style.display = 'none');
+
+        const opt = {
+            margin: 10,
+            filename: 'Kishinev_Cemetery_Registry.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            // Возвращаем звездочки обратно после скачивания
+            stars.forEach(s => s.style.display = '');
+        });
+    }
+
     function toggleFav(id) {
         const idx = favorites.findIndex(f => f[0] === id);
         if (idx > -1) favorites.splice(idx, 1);
@@ -239,27 +261,14 @@
     }
 
     function showFavorites() {
-        if (favorites.length === 0) return alert("Favorites is empty");
+        if (favorites.length === 0) return alert("Список избранного пуст");
         currentView = favorites;
         render(favorites);
     }
 
     function updateFavCount() { document.getElementById('fav-count').innerText = favorites.length; }
-
     function resetUI() { document.getElementById('searchArea').style.display = 'block'; document.getElementById('resultsWrapper').style.display = 'none'; }
     function toggleFilters() { const p = document.getElementById('filtersPanel'); p.style.display = p.style.display==='grid'?'none':'grid'; }
-
-    function exportToPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text(translations[currentLang].title, 10, 10);
-        doc.autoTable({
-            head: [[translations[currentLang].colFio, translations[currentLang].colB, translations[currentLang].colD, translations[currentLang].colS, translations[currentLang].colN]],
-            body: currentView.map(r => [r[1], r[2], r[3], r[5], r[4]]),
-            startY: 20
-        });
-        doc.save('bsearch_export.pdf');
-    }
 
     document.getElementById('searchInput').onkeypress = e => { if(e.key === 'Enter') performSearch(); };
     window.onload = init;
