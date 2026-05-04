@@ -33,9 +33,7 @@
         th { background: #f9fafb; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
         td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
-        .btn-map { background: #eff6ff; color: var(--brand); border: 1px solid #dbeafe; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .btn-map:hover { background: #dbeafe; }
-        .btn-share { background: #f3f4f6; border: 1px solid #e5e7eb; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; color: #4b5563; }
+        .btn-share { background: #f3f4f6; border: 1px solid #e5e7eb; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; color: #4b5563; transition: 0.2s; }
         .btn-share:hover { background: #e5e7eb; }
 
         @media (max-width: 768px) {
@@ -44,7 +42,6 @@
             td { display: flex; justify-content: space-between; border: none; padding: 8px 0; align-items: center; }
             td::before { content: attr(data-label); font-weight: 700; color: #6b7280; font-size: 11px; }
             tr { display: block; border-bottom: 2px solid var(--border); padding: 10px 0; }
-            .action-cell { flex-direction: row; gap: 8px; }
         }
     </style>
 </head>
@@ -114,7 +111,6 @@
 <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPQWudyymuRTEaC9_FQYCyZFSoAp2P30Me_Th6dWDMHckiD6BnT3fQ9cfR4UreAlmxrujIb5aqKlJ/pub?gid=726531709&single=true&output=csv';
     const cemeteryCenter = [47.0356, 28.7970];
-    const sectorCoords = {};
 
     const translations = {
         ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", actions: "Действия", contact: "Обратная связь", send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено", copy: "Копировать ссылку", copied: "Ссылка скопирована!" },
@@ -214,19 +210,11 @@
                     <td data-label="${t.d}">${r[3]||'-'}</td>
                     <td data-label="${t.s}">${r[5]||'-'}</td>
                     <td data-label="${t.n}">${r[4]||'-'}</td>
-                    <td data-label="${t.actions}" class="action-cell">
-                        <button class="btn-map" onclick="focusSector('${r[5]}')" title="${t.m}">📍</button>
+                    <td data-label="${t.actions}">
                         <button class="btn-share" onclick="copyLink('${r[0]}')">🔗 ${t.copy}</button>
                     </td>
                 </tr>`;
         });
-    }
-
-    function focusSector(s) {
-        const coords = sectorCoords[s] || cemeteryCenter;
-        map.flyTo(coords, 18);
-        marker.setLatLng(coords).setPopupContent(s ? `Sector ${s}` : "Cemetery").openPopup();
-        document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
     }
 
     function copyLink(id) {
