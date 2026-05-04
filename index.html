@@ -3,41 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BSearch | Kishinev Cemetery Navigation</title>
+    <title>BSearch | Kishinev Cemetery</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        :root { --brand: #1e3a8a; --bg: #fcfcfd; --border: #e5e7eb; --accent: #fbbf24; }
+        :root { --brand: #1e3a8a; --bg: #fcfcfd; --border: #e5e7eb; --accent: #fbbf24; --success: #059669; }
         body { margin: 0; font-family: "Inter", sans-serif; background: var(--bg); color: #1f2937; }
         
-        .hero { background: var(--brand); color: white; padding: 40px 20px; text-align: center; position: relative; }
-        .container { max-width: 1000px; margin: -20px auto 40px; padding: 0 20px; position: relative; z-index: 10; }
+        .hero { background: var(--brand); color: white; padding: 40px 20px; text-align: center; }
+        .container { max-width: 1000px; margin: -20px auto 40px; padding: 0 20px; }
         
         .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
         .search-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        input { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; }
+        input { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; outline: none; }
         
         .btn-main { background: var(--brand); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; }
         .btn-text { background: none; border: none; color: var(--brand); cursor: pointer; font-weight: 600; font-size: 13px; }
         
-        #map { height: 450px; border-radius: 12px; margin-top: 20px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        #map { height: 400px; border-radius: 12px; margin-top: 20px; border: 1px solid var(--border); z-index: 1; }
         
         .results-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th { background: #f9fafb; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
         td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
-        .sector-badge { background: #eff6ff; color: var(--brand); padding: 2px 8px; border-radius: 4px; font-weight: 700; border: 1px solid #dbeafe; }
-        .share-btn { background: #f3f4f6; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: 0.2s; }
-        .share-btn:hover { background: #e5e7eb; }
+        .btn-map-action { background: #eff6ff; color: var(--brand); border: 1px solid #dbeafe; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; }
+        .btn-map-action:hover { background: #dbeafe; }
+        .btn-share { background: #f3f4f6; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-left: 5px; }
 
         @media (max-width: 768px) {
             .search-group { flex-direction: column; }
             th { display: none; }
-            td { display: flex; justify-content: space-between; border: none; padding: 8px 0; }
-            td::before { content: attr(data-label); font-weight: 700; color: var(--text-muted); font-size: 12px; }
+            td { display: flex; justify-content: space-between; border: none; padding: 8px 0; align-items: center; }
+            td::before { content: attr(data-label); font-weight: 700; color: #6b7280; font-size: 12px; }
             tr { display: block; border-bottom: 2px solid var(--border); padding: 10px 0; }
         }
     </style>
@@ -46,18 +46,17 @@
 
 <header class="hero">
     <h1>Кишиневское Еврейское Кладбище</h1>
-    <p>Поиск захоронений и навигация по участкам</p>
+    <p>Электронный реестр и навигация</p>
 </header>
 
 <div class="container">
     <div class="card" id="searchBox">
-        <div class="search-hint" style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">Поиск на кириллице или латинице</div>
         <div class="search-group">
-            <input type="text" id="searchInput" placeholder="Фамилия...">
-            <button class="btn-main" onclick="performSearch()">НАЙТИ</button>
+            <input type="text" id="searchInput" placeholder="Фамилия (напр. Гринберг)...">
+            <button class="btn-main" onclick="performSearch()">ПОИСК</button>
         </div>
         <div style="display:flex; justify-content: space-between;">
-            <button class="btn-text" onclick="toggleFilters()">⚙ Годы жизни</button>
+            <button class="btn-text" onclick="toggleFilters()">⚙ Параметры</button>
             <button class="btn-text" onclick="showFavorites()">⭐ Избранное (<span id="fav-count">0</span>)</button>
         </div>
         <div id="filterPanel" style="display:none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
@@ -68,8 +67,8 @@
 
     <div id="resultsView" style="display:none; margin-top: 20px;">
         <div style="margin-bottom: 15px; display: flex; gap: 10px;">
-            <button class="btn-main" onclick="location.reload()" style="background:#64748b;">← К поиску</button>
-            <button class="btn-main" onclick="exportToPDF()" style="background:#059669;">📄 PDF</button>
+            <button class="btn-main" onclick="location.reload()" style="background:#64748b;">← Назад</button>
+            <button class="btn-main" onclick="exportToPDF()" style="background:var(--success);">📄 PDF</button>
         </div>
         <div class="card">
             <table class="results-table">
@@ -77,8 +76,8 @@
                     <tr>
                         <th>ФИО</th>
                         <th>Годы</th>
-                        <th>Участок (Сектор)</th>
-                        <th>Действие</th>
+                        <th>Место</th>
+                        <th>Навигация</th>
                     </tr>
                 </thead>
                 <tbody id="resultsBody"></tbody>
@@ -89,10 +88,10 @@
     <div id="map"></div>
 
     <div class="card" style="margin-top: 20px;">
-        <h3>Связь с администрацией</h3>
+        <h3>Обратная связь</h3>
         <form action="https://formspree.io/f/xvzbwgzp" method="POST" style="display: grid; gap: 10px;">
             <input type="email" name="email" placeholder="Ваш Email" required style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;">
-            <textarea name="message" placeholder="Сообщить об уточнении данных или прислать фото..." rows="3" style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;"></textarea>
+            <textarea name="message" placeholder="Уточните данные или задайте вопрос..." rows="3" style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;"></textarea>
             <button type="submit" class="btn-main">ОТПРАВИТЬ</button>
         </form>
     </div>
@@ -101,56 +100,55 @@
 <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPQWudyymuRTEaC9_FQYCyZFSoAp2P30Me_Th6dWDMHckiD6BnT3fQ9cfR4UreAlmxrujIb5aqKlJ/pub?gid=726531709&single=true&output=csv';
     
-    // Координаты центральных точек секторов (примерные, нужно будет подправить под реальную схему)
+    // Координаты секторов (уточните их по карте)
     const sectorCoords = {
         "1": [47.0350, 28.7960],
         "2": [47.0355, 28.7965],
         "3": [47.0360, 28.7970],
         "4": [47.0352, 28.7980],
         "5": [47.0345, 28.7975],
-        "default": [47.0356, 28.7970] // Центральный вход
+        "default": [47.0356, 28.7970] 
     };
 
     let allData = [];
     let map, mainMarker;
-    let favorites = JSON.parse(localStorage.getItem('bsearch_fav') || '[]');
 
     function initMap() {
         map = L.map('map').setView(sectorCoords.default, 16);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+            attribution: '© OpenStreetMap'
         }).addTo(map);
         mainMarker = L.marker(sectorCoords.default).addTo(map).bindPopup("Кишиневское Еврейское Кладбище");
     }
 
     async function loadData() {
-        const res = await fetch(CSV_URL);
-        const text = await res.text();
-        allData = text.split('\n').slice(1).map(l => l.split(',')).filter(r => r[1]);
-        
-        // Проверка Deep Link
-        const urlId = new URLSearchParams(window.location.search).get('id');
-        if(urlId) {
-            const entry = allData.find(x => x[0] === urlId);
-            if(entry) renderResults([entry]);
-        }
-        document.getElementById('fav-count').innerText = favorites.length;
+        try {
+            const res = await fetch(CSV_URL);
+            const text = await res.text();
+            allData = text.split('\n').slice(1).map(l => l.split(',')).filter(r => r[1]);
+            
+            const urlId = new URLSearchParams(window.location.search).get('id');
+            if(urlId) {
+                const entry = allData.find(x => x[0] === urlId);
+                if(entry) renderResults([entry]);
+            }
+        } catch(e) { console.error("Ошибка загрузки данных"); }
     }
 
     function performSearch() {
-        const q = document.getElementById('searchInput').value.toLowerCase();
+        const val = document.getElementById('searchInput').value.toLowerCase();
         const yF = parseInt(document.getElementById('yearFrom').value) || 0;
         const yT = parseInt(document.getElementById('yearTo').value) || 2050;
-
+        
         const results = allData.filter(r => {
-            const nameMatch = r[1].toLowerCase().includes(q);
-            const birth = parseInt(r[2]) || 0;
-            const death = parseInt(r[3]) || 2050;
-            return nameMatch && (birth >= yF || yF === 0) && (death <= yT);
+            const nameMatch = r[1].toLowerCase().includes(val);
+            const b = parseInt(r[2]) || 0;
+            const d = parseInt(r[3]) || 2050;
+            return nameMatch && (b >= yF || yF === 0) && (d <= yT);
         });
 
-        if(results.length > 0) renderResults(results);
-        else alert("Ничего не найдено");
+        if(results.length) renderResults(results);
+        else alert("Записей не найдено");
     }
 
     function renderResults(data) {
@@ -164,28 +162,27 @@
                 <tr>
                     <td data-label="ФИО"><b>${r[1]}</b></td>
                     <td data-label="Годы">${r[2]||'?'}-${r[3]||'?'}</td>
-                    <td data-label="Участок"><span class="sector-badge" onclick="focusSector('${r[5]}')">Сектор ${r[5]}</span></td>
-                    <td data-label="Действие">
-                        <button class="share-btn" onclick="copyLink('${r[0]}')">🔗 Ссылка</button>
+                    <td data-label="Место">Сектор ${r[5]}, ряд ${r[4]}</td>
+                    <td data-label="Навигация">
+                        <button class="btn-map-action" onclick="focusSector('${r[5]}')">📍 На карте</button>
+                        <button class="btn-share" onclick="copyLink('${r[0]}')">🔗</button>
                     </td>
                 </tr>`;
         });
-
-        // Подсвечиваем сектор первого результата
-        if(data[0][5]) focusSector(data[0][5]);
     }
 
     function focusSector(sectorNum) {
         const coords = sectorCoords[sectorNum] || sectorCoords.default;
         map.flyTo(coords, 18);
         mainMarker.setLatLng(coords)
-                  .setPopupContent(`<b>Участок №${sectorNum}</b><br>Искомое захоронение находится здесь.`)
+                  .setPopupContent(`<b>Сектор №${sectorNum}</b><br>Искомый участок находится в этой области.`)
                   .openPopup();
+        document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
     }
 
     function copyLink(id) {
         const link = window.location.origin + window.location.pathname + "?id=" + id;
-        navigator.clipboard.writeText(link).then(() => alert("Ссылка на запись скопирована"));
+        navigator.clipboard.writeText(link).then(() => alert("Ссылка скопирована"));
     }
 
     function toggleFilters() {
@@ -193,8 +190,12 @@
         p.style.display = p.style.display === 'none' ? 'grid' : 'none';
     }
 
+    function exportToPDF() {
+        const element = document.getElementById('resultsView');
+        html2pdf().from(element).save('Cemetery_Search.pdf');
+    }
+
     window.onload = () => { initMap(); loadData(); };
 </script>
-
 </body>
 </html>
