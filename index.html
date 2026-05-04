@@ -33,12 +33,17 @@
         th { background: #f9fafb; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
         td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px; }
+        .info-item h4 { margin: 0 0 5px 0; color: var(--brand); font-size: 14px; }
+        .info-item p { margin: 0; font-size: 13px; line-height: 1.4; color: #4b5563; }
+
         @media (max-width: 768px) {
             .search-group { flex-direction: column; }
             th { display: none; }
             td { display: flex; justify-content: space-between; border: none; padding: 8px 0; align-items: center; }
             td::before { content: attr(data-label); font-weight: 700; color: #6b7280; font-size: 11px; }
             tr { display: block; border-bottom: 2px solid var(--border); padding: 10px 0; }
+            .info-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -95,6 +100,28 @@
     <div id="map"></div>
 
     <div class="card">
+        <h3 id="t-info-title">Информация о кладбище</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <h4 id="t-i-addr">Адрес и транспорт</h4>
+                <p id="t-i-addr-val">ул. Милано, 1 (Буюканы). Троллейбусы: 1, 5, 8, 18, 23. Остановка «ул. Милано».</p>
+            </div>
+            <div class="info-item">
+                <h4 id="t-i-hours">Часы работы</h4>
+                <p id="t-i-hours-val">Ежедневно: 08:00 – 17:00. Закрыто в Шаббат и праздники.</p>
+            </div>
+            <div class="info-item">
+                <h4 id="t-i-admin">Администрация</h4>
+                <p id="t-i-admin-val">Комбинат ритуальных услуг г. Кишинева / Музей истории евреев РМ.</p>
+            </div>
+            <div class="info-item">
+                <h4 id="t-i-rules">Правила</h4>
+                <p id="t-i-rules-val">Мужчинам рекомендуется головной убор. Соблюдайте тишину.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
         <h3 id="t-contact">Обратная связь</h3>
         <form action="https://formspree.io/f/xvzbwgzp" method="POST" style="display: grid; gap: 10px;">
             <input type="email" name="email" placeholder="Email" required style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;">
@@ -109,9 +136,18 @@
     const cemeteryCenter = [47.0356, 28.7970];
 
     const translations = {
-        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", contact: "Обратная связь", send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено" },
-        en: { title: "Kishinev Jewish Cemetery", subtitle: "Burial Registry & Navigation", search: "SEARCH", filter: "⚙ Years of Life", fav: "⭐ Favorites", back: "← Back", pdf: "📄 Download PDF", fio: "Full Name", b: "Birth", d: "Death", s: "Sector", n: "Grave No.", contact: "Contact Us", send: "SEND", ph: "Enter last name", msg: "Your message...", alert: "Nothing found" },
-        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה וניווט", search: "חיפוש", filter: "⚙ שנות חיים", fav: "⭐ מועדפים", back: "← חזור", pdf: "📄 הורד PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", contact: "צור קשר", send: "שלח", ph: "הזן שם משפחה", msg: "ההודעה שלך...", alert: "לא נמצאו תוצאות" }
+        ru: { 
+            title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", contact: "Обратная связь", send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено",
+            infoTitle: "Информация о кладбище", iAddr: "Адрес и транспорт", iAddrVal: "ул. Милано, 1 (Буюканы). Троллейбусы: 1, 5, 8, 18, 23. Остановка «ул. Милано».", iHours: "Часы работы", iHoursVal: "Ежедневно: 08:00 – 17:00. Закрыто в Шаббат и праздники.", iAdmin: "Администрация", iAdminVal: "Комбинат ритуальных услуг г. Кишинева / Музей истории евреев РМ.", iRules: "Правила", iRulesVal: "Мужчинам рекомендуется головной убор. Соблюдайте тишину."
+        },
+        en: { 
+            title: "Kishinev Jewish Cemetery", subtitle: "Burial Registry & Navigation", search: "SEARCH", filter: "⚙ Years of Life", fav: "⭐ Favorites", back: "← Back", pdf: "📄 Download PDF", fio: "Full Name", b: "Birth", d: "Death", s: "Sector", n: "Grave No.", contact: "Contact Us", send: "SEND", ph: "Enter last name", msg: "Your message...", alert: "Nothing found",
+            infoTitle: "Cemetery Information", iAddr: "Address & Transport", iAddrVal: "1, Milano str. (Buiucani). Trolleys: 1, 5, 8, 18, 23. Stop: 'Milano str'.", iHours: "Opening Hours", iHoursVal: "Daily: 08:00 – 17:00. Closed on Shabbat and holidays.", iAdmin: "Management", iAdminVal: "Chisinau Ritual Services / Museum of Jewish History of Moldova.", iRules: "Visitor Rules", iRulesVal: "Head covering for men is recommended. Please maintain silence."
+        },
+        he: { 
+            title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה וניווט", search: "חיפוש", filter: "⚙ שנות חיים", fav: "⭐ מועדפים", back: "← חזור", pdf: "📄 הורד PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", contact: "צור קשר", send: "שלח", ph: "הזן שם משפחה", msg: "ההודעה שלך...", alert: "לא נמצאו תוצאות",
+            infoTitle: "מידע על בית העלמין", iAddr: "כתובת ותחבורה", iAddrVal: "רח' מילאנו 1 (בויקאני). טרוליבוס: 1, 5, 8, 18, 23. תחנה: 'רח' מילאנו'.", iHours: "שעות פעילות", iHoursVal: "כל יום: 08:00 – 17:00. סגור בשבתות ובחגים.", iAdmin: "ניהול", iAdminVal: "שירותי קבורה עירוניים קישינב / המוזיאון לתולדות יהודי מולדובה.", iRules: "כללי ביקור", iRulesVal: "מומלץ לגברים לחבוש כיסוי ראש. נא לשמור על השקט."
+        }
     };
 
     const translitMap = {"a":"а","b":"б","v":"в","g":"г","d":"д","e":"е","yo":"ё","zh":"ж","z":"з","i":"и","j":"й","k":"к","l":"л","m":"м","n":"н","o":"о","p":"п","r":"р","s":"с","t":"т","u":"у","f":"ф","h":"х","ts":"ц","ch":"ч","sh":"ш","shch":"щ","y":"ы","yu":"ю","ya":"я"};
@@ -138,6 +174,18 @@
         document.getElementById('t-send').innerText = t.send;
         document.getElementById('searchInput').placeholder = t.ph;
         document.getElementById('t-msg-ph').placeholder = t.msg;
+        
+        // Info block translations
+        document.getElementById('t-info-title').innerText = t.infoTitle;
+        document.getElementById('t-i-addr').innerText = t.iAddr;
+        document.getElementById('t-i-addr-val').innerText = t.iAddrVal;
+        document.getElementById('t-i-hours').innerText = t.iHours;
+        document.getElementById('t-i-hours-val').innerText = t.iHoursVal;
+        document.getElementById('t-i-admin').innerText = t.iAdmin;
+        document.getElementById('t-i-admin-val').innerText = t.iAdminVal;
+        document.getElementById('t-i-rules').innerText = t.iRules;
+        document.getElementById('t-i-rules-val').innerText = t.iRulesVal;
+
         document.body.dir = lang === 'he' ? 'rtl' : 'ltr';
     }
 
