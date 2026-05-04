@@ -42,7 +42,10 @@
 
         .btn-main { background: var(--brand-color); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-weight: 700; cursor: pointer; }
         .btn-secondary { background: white; color: var(--text-main); border: 1px solid var(--border); padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-text { background: none; border: none; color: var(--brand-color); cursor: pointer; font-size: 13px; font-weight: 600; }
         .btn-share { background: #f3f4f6; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--brand-color); font-weight: bold; }
+
+        .filters-panel { display: none; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border); }
 
         .results-wrapper { margin-top: 30px; }
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
@@ -58,6 +61,7 @@
 
         @media (max-width: 768px) {
             .search-group { flex-direction: column; }
+            .filters-panel { grid-template-columns: 1fr; }
             table thead { display: none; }
             tr { display: block; background: white; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
             td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border: none; text-align: right; }
@@ -88,9 +92,16 @@
             <input type="text" id="searchInput" placeholder="Фамилия..." disabled>
             <button class="btn-main" id="searchBtn" onclick="performSearch()" disabled>ПОИСК</button>
         </div>
-        <button class="btn-text" style="background:none; border:none; color:var(--brand-color); cursor:pointer; font-weight:600;" onclick="showFavorites()">
-            ⭐ Избранное (<span id="fav-count">0</span>)
-        </button>
+        
+        <div class="controls" style="display: flex; justify-content: space-between; margin-top: 10px;">
+            <button class="btn-text" onclick="toggleFilters()" id="t-filter-btn">⚙ Параметры</button>
+            <button class="btn-text" onclick="showFavorites()">⭐ Избранное (<span id="fav-count">0</span>)</button>
+        </div>
+
+        <div id="filtersPanel" class="filters-panel">
+            <input type="number" id="yearFrom" placeholder="Год рождения от">
+            <input type="number" id="yearTo" placeholder="Год смерти до">
+        </div>
     </div>
 
     <div class="results-wrapper" id="resultsWrapper" style="display:none;">
@@ -153,9 +164,9 @@
     }
 
     const translations = {
-        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Электронный реестр памяти", search: "ПОИСК", fav: "⭐ Избранное", back: "← Назад", colFio: "ФИО", colB: "Рождение", colD: "Смерть", colS: "Сектор", colN: "№ Могилы", loading: "Поиск на кириллице или латинице", map: "Схема кладбища", contact: "Обратная связь", hint: "Сообщите об ошибке или пришлите координаты.", send: "ОТПРАВИТЬ", link: "🔗 Ссылка" },
-        en: { title: "Kishinev Jewish Cemetery", subtitle: "Memorial Registry", search: "SEARCH", fav: "⭐ Favorites", back: "← Back", colFio: "Full Name", colB: "Birth", colD: "Death", colS: "Sector", colN: "Grave #", loading: "Search in Cyrillic or Latin", map: "Cemetery Map", contact: "Contact Us", hint: "Report errors or send coordinates.", send: "SEND", link: "🔗 Link" },
-        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר זיכרון אלקטרוני", search: "חיפוש", fav: "⭐ מועדפים", back: "← חזור", colFio: "שם מלא", colB: "לידה", colD: "פטירה", colS: "חלקה", colN: "קבר מס'", loading: "חיפוש בקירילית או לטינית", map: "מפת בית העלמין", contact: "צור קשר", hint: "דווח על טעויות או שלח קואורדינטות", send: "שלח", link: "🔗 קישור" }
+        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Электронный реестр памяти", search: "ПОИСК", filter: "⚙ Параметры", fav: "⭐ Избранное", back: "← Назад", colFio: "ФИО", colB: "Рождение", colD: "Смерть", colS: "Сектор", colN: "№ Могилы", loading: "Поиск на кириллице или латинице", map: "Схема кладбища", contact: "Обратная связь", hint: "Сообщите об ошибке или пришлите координаты.", send: "ОТПРАВИТЬ", link: "🔗 Ссылка" },
+        en: { title: "Kishinev Jewish Cemetery", subtitle: "Memorial Registry", search: "SEARCH", filter: "⚙ Options", fav: "⭐ Favorites", back: "← Back", colFio: "Full Name", colB: "Birth", colD: "Death", colS: "Sector", colN: "Grave #", loading: "Search in Cyrillic or Latin", map: "Cemetery Map", contact: "Contact Us", hint: "Report errors or send coordinates.", send: "SEND", link: "🔗 Link" },
+        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר זיכרון אלקטרוני", search: "חיפוש", filter: "⚙ אפשרויות", fav: "⭐ מועדפים", back: "← חזור", colFio: "שם מלא", colB: "לידה", colD: "פטירה", colS: "חלקה", colN: "קבר מס'", loading: "חיפוש בקירילית או לטינית", map: "מפת בית העלמין", contact: "צור קשר", hint: "דווח על טעויות או שלח קואורדינטות", send: "שלח", link: "🔗 קישור" }
     };
 
     function setLang(lang) {
@@ -165,6 +176,7 @@
         document.getElementById('t-title').innerText = t.title;
         document.getElementById('t-subtitle').innerText = t.subtitle;
         document.getElementById('searchBtn').innerText = t.search;
+        document.getElementById('t-filter-btn').innerText = t.filter;
         document.getElementById('t-back').innerText = t.back;
         document.getElementById('status').innerText = t.loading;
         document.querySelectorAll('#resultsTable th').forEach((th, i) => { 
@@ -202,11 +214,28 @@
         } catch (e) { document.getElementById('status').innerText = "Data error"; }
     }
 
+    function toggleFilters() {
+        const p = document.getElementById('filtersPanel');
+        p.style.display = p.style.display === 'grid' ? 'none' : 'grid';
+    }
+
     function performSearch() {
         const val = document.getElementById('searchInput').value.trim().toLowerCase();
-        if(!val) return;
+        const yF = parseInt(document.getElementById('yearFrom').value) || 0;
+        const yT = parseInt(document.getElementById('yearTo').value) || 2100;
+        
+        if(!val && yF === 0 && yT === 2100) return;
+
         const query = /[a-z]/.test(val) ? autoTranslit(val) : val;
-        currentView = allData.filter(r => r[1].toLowerCase().includes(query));
+        
+        currentView = allData.filter(r => {
+            const nameMatch = val === "" || r[1].toLowerCase().includes(query);
+            const bYear = parseInt(r[2]) || 0;
+            const dYear = parseInt(r[3]) || 2100;
+            const yearMatch = (bYear >= yF || yF === 0) && (dYear <= yT);
+            return nameMatch && yearMatch;
+        });
+
         if (currentView.length === 0) return alert("Ничего не найдено");
         render(currentView);
     }
@@ -252,6 +281,7 @@
     }
 
     function updateFavCount() { document.getElementById('fav-count').innerText = favorites.length; }
+    
     function resetUI() { 
         document.getElementById('searchArea').style.display = 'block'; 
         document.getElementById('resultsWrapper').style.display = 'none';
