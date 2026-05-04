@@ -39,7 +39,8 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid var(--border);
         }
         
-        .search-hint { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; }
+        .search-hint { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4; }
+        .search-hint b { color: var(--brand-color); }
 
         .search-group { display: flex; gap: 10px; margin-bottom: 15px; }
         input { 
@@ -49,34 +50,40 @@
 
         .filter-toggle {
             background: none; border: none; color: var(--brand-color);
-            cursor: pointer; font-size: 13px; font-weight: 600; padding: 0; margin-bottom: 10px;
+            cursor: pointer; font-size: 13px; font-weight: 600; padding: 0; margin-bottom: 15px;
             display: flex; align-items: center; gap: 5px;
         }
 
         .filters-panel {
-            display: none; grid-template-columns: 1fr 1fr; gap: 10px;
-            padding: 15px; background: #f9fafb; border-radius: 8px; margin-bottom: 15px;
+            display: none; grid-template-columns: 1fr 1fr; gap: 15px;
+            padding: 15px; background: #f9fafb; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border);
         }
 
         .btn-main { 
             background: var(--brand-color); color: white; border: none;
             padding: 16px 30px; border-radius: 8px; font-weight: 700; cursor: pointer;
+            transition: opacity 0.2s;
         }
+        .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .results-wrapper { margin-top: 30px; }
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-        th { background: #f9fafb; padding: 16px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border); cursor: pointer; }
+        th { background: #f9fafb; padding: 16px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border); cursor: pointer; color: var(--text-muted); }
         td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 15px; }
 
+        .map-box { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; padding: 10px; margin-top: 30px; }
+        .contact-box { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 30px; margin: 30px 0; }
+        
         .highlight { background: #BADCF8; color: #000; font-weight: 700; padding: 0 2px; }
+        .footer { padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 14px; border-top: 1px solid var(--border); background: white; }
 
         @media (max-width: 768px) {
             .search-group { flex-direction: column; }
             .filters-panel { grid-template-columns: 1fr; }
             table thead { display: none; }
             tr { display: block; background: white; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border); padding: 15px; }
-            td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
-            td::before { content: attr(data-label); font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 800; }
+            td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f3f4f6; text-align: right; }
+            td::before { content: attr(data-label); font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 800; text-align: left; margin-right: 10px; }
         }
     </style>
 </head>
@@ -103,18 +110,18 @@
         
         <div id="filtersPanel" class="filters-panel">
             <div>
-                <label style="font-size: 12px; font-weight: bold;">Год рождения (от):</label>
-                <input type="number" id="yearFrom" placeholder="1850" style="padding: 8px; font-size: 14px;">
+                <label style="display:block; font-size: 12px; font-weight: bold; margin-bottom: 5px;">Год рождения (от):</label>
+                <input type="number" id="yearFrom" placeholder="Напр. 1880" style="padding: 10px; font-size: 14px; border: 1px solid var(--border); border-radius: 6px; width: 100%;">
             </div>
             <div>
-                <label style="font-size: 12px; font-weight: bold;">Год смерти (до):</label>
-                <input type="number" id="yearTo" placeholder="2026" style="padding: 8px; font-size: 14px;">
+                <label style="display:block; font-size: 12px; font-weight: bold; margin-bottom: 5px;">Год смерти (до):</label>
+                <input type="number" id="yearTo" placeholder="Напр. 1950" style="padding: 10px; font-size: 14px; border: 1px solid var(--border); border-radius: 6px; width: 100%;">
             </div>
         </div>
     </div>
 
     <div class="results-wrapper">
-        <button onclick="resetUI()" id="backBtn" style="display:none; margin-bottom: 20px; padding: 12px 24px; cursor:pointer; font-weight:bold; border-radius:8px; border:1px solid var(--border); background: white;">← Назад к поиску</button>
+        <button onclick="resetUI()" id="backBtn" style="display:none; margin-bottom: 20px; padding: 12px 24px; cursor:pointer; font-weight:bold; border-radius:8px; border:1px solid var(--border); background: white;">← Вернуться к поиску</button>
         
         <table id="resultsTable" style="display: none;">
             <thead>
@@ -129,7 +136,26 @@
             <tbody id="resultsBody"></tbody>
         </table>
     </div>
+
+    <section class="map-box">
+        <h3 style="padding: 10px 15px; margin: 0; color: var(--brand-color); font-size: 1.1rem;">Интерактивная схема секторов</h3>
+        <iframe width="100%" height="400" frameborder="0" src="https://www.openstreetmap.org/export/embed.html?bbox=28.7900,47.0320,28.8050,47.0390&layer=mapnik&marker=47.0356,28.7970"></iframe>
+    </section>
+
+    <section class="contact-box">
+        <h3>Сообщить об ошибке или дополнении</h3>
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Если вы нашли неточность в данных или хотите добавить информацию, пожалуйста, напишите нам.</p>
+        <form action="https://formspree.io/f/xvzbwgzp" method="POST" style="display: grid; gap: 15px;">
+            <input type="email" name="email" placeholder="Ваш Email для ответа" required style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;">
+            <textarea name="message" rows="4" placeholder="Укажите ФИО захороненного и суть изменений..." required style="padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit;"></textarea>
+            <button type="submit" class="btn-main">ОТПРАВИТЬ СООБЩЕНИЕ</button>
+        </form>
+    </section>
 </div>
+
+<footer class="footer">
+    © 2026 BSearch | Общественный реестр памяти Кишинева
+</footer>
 
 <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPQWudyymuRTEaC9_FQYCyZFSoAp2P30Me_Th6dWDMHckiD6BnT3fQ9cfR4UreAlmxrujIb5aqKlJ/pub?gid=726531709&single=true&output=csv';
@@ -137,18 +163,16 @@
     let allData = [];
     let filteredResults = [];
 
-    // Карта транслитерации
+    // Карта транслитерации для поиска латиницей
     const translitMap = {"a":"а","b":"б","v":"в","g":"г","d":"д","e":"е","yo":"ё","zh":"ж","z":"з","i":"и","j":"й","k":"к","l":"л","m":"м","n":"н","o":"о","p":"п","r":"р","s":"с","t":"т","u":"у","f":"ф","h":"х","ts":"ц","ch":"ч","sh":"ш","shch":"щ","y":"ы","yu":"ю","ya":"я","ai":"ай","ei":"ей"};
 
     function autoTranslit(text) {
         let output = text.toLowerCase();
-        // Сначала заменяем сложные сочетания
         const complex = ["shch","yo","zh","ts","ch","sh","yu","ya","ai","ei"];
         complex.forEach(c => {
             const reg = new RegExp(c, "g");
             output = output.replace(reg, translitMap[c]);
         });
-        // Затем одиночные буквы
         return output.split('').map(char => translitMap[char] || char).join('');
     }
 
@@ -175,11 +199,11 @@
             const response = await fetch(CSV_URL);
             const text = await response.text();
             allData = parseCSV(text);
-            document.getElementById('status').innerHTML = "Реестр загружен. Доступен поиск на русском и латинице.";
+            document.getElementById('status').innerHTML = "Введите <b>фамилию</b> или <b>имя</b>. <br>Доступен поиск на русском и латинице (напр. <i>Roizer</i>).";
             document.getElementById('searchInput').disabled = false;
             document.getElementById('searchBtn').disabled = false;
         } catch (e) {
-            document.getElementById('status').innerText = 'Ошибка загрузки.';
+            document.getElementById('status').innerText = 'Ошибка загрузки базы данных.';
         }
     }
 
@@ -189,10 +213,13 @@
     }
 
     function performSearch() {
-        const input = document.getElementById('searchInput').value.trim().toLowerCase();
-        if (!input) return;
+        const inputVal = document.getElementById('searchInput').value.trim().toLowerCase();
+        if (inputVal.length < 2) {
+            alert('Пожалуйста, введите минимум 2 символа.');
+            return;
+        }
 
-        const query = /[a-z]/.test(input) ? autoTranslit(input) : input;
+        const query = /[a-z]/.test(inputVal) ? autoTranslit(inputVal) : inputVal;
         const yearFrom = parseInt(document.getElementById('yearFrom').value) || 0;
         const yearTo = parseInt(document.getElementById('yearTo').value) || 2100;
 
@@ -200,15 +227,12 @@
             const nameMatch = row[1] && row[1].toLowerCase().includes(query);
             const birthYear = parseInt(row[2]) || 0;
             const deathYear = parseInt(row[3]) || 2100;
-
-            // Логика фильтра: если года указаны, проверяем вхождение
             const yearMatch = (birthYear >= yearFrom || yearFrom === 0) && (deathYear <= yearTo);
-            
             return nameMatch && yearMatch;
         });
 
         if (filteredResults.length === 0) {
-            alert('Совпадений не найдено. Попробуйте только фамилию.');
+            alert('Ничего не найдено. Попробуйте изменить параметры поиска.');
             return;
         }
 
@@ -216,7 +240,7 @@
         document.getElementById('resultsTable').style.display = 'table';
         document.getElementById('backBtn').style.display = 'block';
         document.getElementById('searchArea').style.display = 'none';
-        window.scrollTo(0,0);
+        window.scrollTo(0, 0);
     }
 
     function render(data, highlight = '') {
@@ -250,6 +274,7 @@
         document.getElementById('resultsTable').style.display = 'none';
         document.getElementById('backBtn').style.display = 'none';
         document.getElementById('searchArea').style.display = 'block';
+        document.getElementById('searchInput').value = '';
     }
 
     function sortData(idx) {
