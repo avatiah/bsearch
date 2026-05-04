@@ -138,7 +138,7 @@
                     <div class="hebrew">יְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ לְעָלַם וּלְעָלְמֵי עָלְמַיָּא. יִתְבָּרַךְ וְיִשְׁתַּבַּח וְיִתְפָּאַר וְיִתְרוֹמַם וְיִתְנַשֵּׂא וְיִתְהַדַּר וְיִתְעַלֶּה וְיִתְהַלָּל שְׁמֵהּ דְּקוּדְשָׁא בְּרִיךְ הוּא. לְעֵלָּא מִן כָּל בִּרְכָתָא וְשִׁירָתָא תֻּשְׁבְּחָתָא וְנֶחֱמָתָא דַּאֲמִירָן בְּעָלְמָא, וְאִמְרוּ אָמֵן.</div>
                     <div class="translit" id="t-trans-2"></div>
                     <div class="translate" id="t-kad-tr2"></div>
-                    <div class="hebrew">יְהֵא שְׁלָמָא רַבָּא מִן שְׁמַיָּא וְחַиִּים עָלֵינוּ וְעַל כָּל יִשְׂרָאֵל, וְאִמְרוּ אָמֵן. עֹשֶׂה שָׁלוֹם בִּמְרוֹמָיו הוּא יַעֲשֶׂה שָׁלוֹם עָלֵינוּ וְעַל כָּל יִשְׂרָאֵל, וְאִמְרוּ אָמֵן.</div>
+                    <div class="hebrew">יְהֵא שְׁלָמָא רַבָּא מִן שְׁמַיָּא וְחַиִּים עָלֵינוּ и עַל כָּל יִשְׂרָאֵל, וְאִמְרוּ אָמֵן. עֹשֶׂה שָׁלוֹם בִּמְרוֹמָיו הוּא יַעֲשֶׂה שָׁלוֹם עָלֵינוּ וְעַל כָּל יִשְׂרָאֵל, וְאִמְרוּ אָמֵן.</div>
                     <div class="translit" id="t-trans-3"></div>
                     <div class="translate" id="t-kad-tr3"></div>
                 </div>
@@ -148,7 +148,8 @@
     </div>
 
     <div class="card">
-        <h3 id="t-contact">Обратная связь</h3>
+        <h3 id="t-contact-title">Сообщить об ошибке или дополнении</h3>
+        <p id="t-contact-desc" style="font-size: 13px; color: #4b5563; margin-bottom: 15px;">Если вы нашли неточность в данных или хотите добавить информацию, пожалуйста, напишите нам.</p>
         <form action="https://formspree.io/f/xvzbwgzp" method="POST" style="display: grid; gap: 10px;">
             <input type="email" name="email" placeholder="Email" required style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;">
             <textarea name="message" id="t-msg-ph" placeholder="Ваше сообщение..." rows="3" style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;"></textarea>
@@ -157,52 +158,69 @@
     </div>
 </div>
 
+<noscript><div><img src="https://mc.yandex.ru/watch/106993438" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
 <script>
+    // Yandex.Metrika counter
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106993438', 'ym');
+    ym(106993438, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPQWudyymuRTEaC9_FQYCyZFSoAp2P30Me_Th6dWDMHckiD6BnT3fQ9cfR4UreAlmxrujIb5aqKlJ/pub?gid=726531709&single=true&output=csv';
     const cemeteryCenter = [47.0356, 28.7970];
 
     const translations = {
         ru: { 
-            title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", contact: "Обратная связь", send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено",
+            title: "Кишиневское Еврейское Кладбище", subtitle: "Реестр захоронений и навигация", search: "ПОИСК", filter: "⚙ Годы жизни", back: "← Назад", pdf: "📄 Скачать PDF", fio: "ФИО", b: "Рождение", d: "Смерть", s: "Сектор", n: "№ Могилы", 
+            contactTitle: "Сообщить об ошибке или дополнении", contactDesc: "Если вы нашли неточность в данных или хотите добавить информацию, пожалуйста, напишите нам.",
+            send: "ОТПРАВИТЬ", ph: "Введите фамилию", msg: "Ваше сообщение...", alert: "Ничего не найдено",
             infoTitle: "Информация о кладбище", iAddr: "Адрес", iAddrVal: "ул. Милано, 1 (Буюканы). Остановка «ул. Милано».", iHours: "Часы работы", iHoursVal: "08:00 – 17:00. Закрыто в Шаббат.",
             accHist: "История кладбища", accPray: "Традиции и молитвы",
-            histFull: `<p>Еврейское кладбище в Кишиневе на Буюканах было основано в XIX веке. Это один из крупнейших некрополей в Европе, сохранивший память о еврейской общине Бессарабии.</p><p><b>Погром 1903 года:</b> На территории находится братская могила жертв Кишиневского погрома. Мемориальные плиты хранят имена погибших. Также здесь расположен мемориал узникам гетто и жертвам Холокоста.</p><p><b>Бейт-Кадишим:</b> Ритуальный зал, построенный в 1913 году, является памятником государственного значения.</p><p><b>Разрушение:</b> В 1960-е годы часть кладбища была разрушена советской властью под парк «Алунелул» и корты.</p>`,
+            histFull: `<p>Еврейское кладбище в Кишиневе на Буюканах было основано в XIX веке. Это один из крупнейших некрополей в Европе...</p><p><b>Погром 1903 года:</b> На территории находится братская могила жертв...</p>`,
             kadIntro: "*Читается родственниками при наличии миньяна (10 мужчин).*",
-            trans1: "Итгадал вэиткадаш шмэй раба. Бэалма ди вра хирутэй, вэямлих малхутэй бэхайейхон увэйомейхон увэхайей дэхоль бэйт исраэль, баагала увизман карив, вэимру амэн.",
-            kadTr1: "Да возвысится и освятится Его великое имя в мире, который Он сотворил по Своей воле...",
-            trans2: "Йеэй шмэй раба мэварах леалам улеалмэй алмаия. Итбарах вэйштабах вэйтпаар вэйтромам вэйтнасэ вэйтадар вэйталэ вэйталал шмэй дэкудша брих у...",
-            kadTr2: "Да будет имя Его великое благословенно вовеки и во веки веков. Да будет благословляемо и прославляемо имя Святого...",
-            trans3: "Йеэй шлама раба мин шмайя вэхайим алэйну вэал коль исраэль. Осэ шалом бимромав у яасэ шалом алэйну вэал коль исраэль, вэимру амэн.",
-            kadTr3: "Да будет ниспослан с небес мир нам и всему Израилю. Устанавливающий мир в Своих высотах, Он пошлет мир нам...",
+            trans1: "Итгадал вэиткадаш шмэй раба. Бэалма ди вра хирутэй...",
+            kadTr1: "Да возвысится и освятится Его великое имя...",
+            trans2: "Йеэй шмэй раба мэварах леалам...",
+            kadTr2: "Да будет имя Его великое благословенно вовеки...",
+            trans3: "Йеэй шлама раба мин шмайя...",
+            kadTr3: "Да будет ниспослан с небес мир нам...",
             prayRules: "<b>Традиции:</b> На могилу принято класть камень вместо цветов. Мужчины покрывают голову. При выходе омывают руки."
         },
         en: { 
-            title: "Kishinev Jewish Cemetery", subtitle: "Burial Registry & Navigation", search: "SEARCH", filter: "⚙ Years", back: "← Back", pdf: "📄 PDF", fio: "Name", b: "Birth", d: "Death", s: "Sector", n: "Grave No.", contact: "Contact", send: "SEND", ph: "Last name", msg: "Message...", alert: "Not found",
-            infoTitle: "General Info", iAddr: "Address", iAddrVal: "1 Milano St. (Buiucani). Stop: 'Milano Str'.", iHours: "Hours", iHoursVal: "08:00 – 17:00. Closed on Shabbat.",
+            title: "Kishinev Jewish Cemetery", subtitle: "Burial Registry & Navigation", search: "SEARCH", filter: "⚙ Years", back: "← Back", pdf: "📄 PDF", fio: "Name", b: "Birth", d: "Death", s: "Sector", n: "Grave No.", 
+            contactTitle: "Report an Error or Add Information", contactDesc: "If you found an inaccuracy in the data or would like to add information, please write to us.",
+            send: "SEND", ph: "Last name", msg: "Message...", alert: "Not found",
+            infoTitle: "General Info", iAddr: "Address", iAddrVal: "1 Milano St. (Buiucani).", iHours: "Hours", iHoursVal: "08:00 – 17:00. Closed on Shabbat.",
             accHist: "Cemetery History", accPray: "Traditions & Prayers",
-            histFull: `<p>Founded in the 19th century, it is one of Europe's largest Jewish necropolises.</p><p><b>1903 Pogrom:</b> Contains a mass grave of the Chisinau Pogrom victims. Memorials for the Ghetto and Holocaust victims are also present.</p><p><b>Beit Kadishim:</b> The ritual hall built in 1913 is a national architectural monument.</p><p><b>Destruction:</b> Part of the site was demolished in the 1960s for "Alunelul" Park.</p>`,
+            histFull: `<p>Founded in the 19th century, it is one of Europe's largest Jewish necropolises.</p>`,
             kadIntro: "*Recited by relatives with a minyan (10 men).*",
-            trans1: "Yitgadal v’yitkadash sh’mei raba. B’alma di v’ra chir’utei, v’yamlich malchutei...",
-            kadTr1: "Exalted and hallowed be His great Name in the world which He created according to His will...",
-            trans2: "Y’hei sh’mei raba m’varach l’alam ul’almei almaya. Yitbarach v’yishtabach...",
-            kadTr2: "May His great Name be blessed forever. Blessed and praised be the Name of the Holy One...",
-            trans3: "Y’hei shlama raba min sh’maya v’chayim aleinu. Oseh shalom bimromav...",
-            kadTr3: "May there be abundant peace from heaven. He who creates peace in His heights, may He create peace for us...",
-            prayRules: "<b>Traditions:</b> Place a stone on the grave. Men cover heads. Wash hands upon exit."
+            trans1: "Yitgadal v’yitkadash sh’mei raba...",
+            kadTr1: "Exalted and hallowed be His great Name...",
+            trans2: "Y’hei sh’mei raba m’varach l’alam...",
+            kadTr2: "May His great Name be blessed forever...",
+            trans3: "Y’hei shlama raba min sh’maya...",
+            kadTr3: "May there be abundant peace from heaven...",
+            prayRules: "<b>Traditions:</b> Place a stone on the grave. Men cover heads. Wash hands."
         },
         he: { 
-            title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה וניווט", search: "חיפוש", filter: "⚙ שנים", back: "← חזור", pdf: "📄 PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", contact: "צור קשר", send: "שלח", ph: "שם משפחה", msg: "הודעה...", alert: "לא נמצא",
-            infoTitle: "מידע כללי", iAddr: "כתובת", iAddrVal: "רח' מילאנו 1. תחנה: 'רח' מילאנו'.", iHours: "שעות פעילות", iHoursVal: "08:00 – 17:00. סגור בשבת.",
+            title: "בית העלמין היהודי בקישינב", subtitle: "מאגר קבורה וניווט", search: "חיפוש", filter: "⚙ שנים", back: "← חזור", pdf: "📄 PDF", fio: "שם מלא", b: "לידה", d: "פטירה", s: "חלקה", n: "קבר מס'", 
+            contactTitle: "דווח על טעות או הוסף מידע", contactDesc: "אם מצאת אי דיוק בנתונים או ברצונך להוסיף מידע, אנא כתוב לנו.",
+            send: "שלח", ph: "שם משפחה", msg: "הודעה...", alert: "לא נמצא",
+            infoTitle: "מידע כללי", iAddr: "כתובת", iAddrVal: "רח' מילאנו 1.", iHours: "שעות פעילות", iHoursVal: "08:00 – 17:00. סגור בשבת.",
             accHist: "היסטוריה של בית העלמין", accPray: "מסורות ותפילות",
-            histFull: `<p>הוקם במאה ה-19, אחד מבתי העלמין היהודיים הגדולים באירופה.</p><p><b>פוגרום 1903:</b> כולל קבר אחים לקורבנות הפוגרום. קיימים אתרי הנצחה לגטו ולשואה.</p><p><b>בית קדישים:</b> אולם הלוויות שנבנה ב-1913 הוא אתר מורשת לאומי.</p><p><b>הרס:</b> חלק מהאתר נהרס בשנות ה-60 להקמת פארק אלונילו.</p>`,
+            histFull: `<p>הוקם במאה ה-19, אחד מבתי העלמין היהודיים הגדולים באירופה.</p>`,
             kadIntro: "*נאמר על ידי קרובי משפחה בנוכחות מניין (10 גברים).*",
-            trans1: "Yitgadal v’yitkadash sh’mei raba. B’alma di v’ra chir’utei...",
-            kadTr1: "יתגדל ויתקדש שמו הגדול בעולם שברא כרצונו...",
-            trans2: "Y’hei sh’mei raba m’varach l’alam ul’almei almaya...",
-            kadTr2: "יהא שמו הגדול מבורך לעולם ולעולמי עולמים. יתברך וישתבח...",
-            trans3: "Y’hei shlama raba min sh’maya v’chayim aleinu...",
-            kadTr3: "יהא שלום רב מן השמים וחיים עלינו. עושה שלום במרומיו...",
-            prayRules: "<b>מסורת:</b> נהוג להניח אבן על המצבה. גברים חובשים כיסוי ראש. יש ליטול ידיים ביציאה."
+            trans1: "Yitgadal v’yitkadash sh’mei raba...",
+            kadTr1: "יתגדל ויתקדש שמו הגדול...",
+            trans2: "Y’hei sh’mei raba m’varach l’alam...",
+            kadTr2: "יהא שמו הגדול מבורך לעולם...",
+            trans3: "Y’hei shlama raba min sh’maya...",
+            kadTr3: "יהא שלום רב מן השמים...",
+            prayRules: "<b>מסורת:</b> נהוג להניח אבן על המצבה. גברים חובשים כיסוי ראש."
         }
     };
 
@@ -232,7 +250,8 @@
         document.getElementById('h-d').innerText = t.d;
         document.getElementById('h-s').innerText = t.s;
         document.getElementById('h-n').innerText = t.n;
-        document.getElementById('t-contact').innerText = t.contact;
+        document.getElementById('t-contact-title').innerText = t.contactTitle;
+        document.getElementById('t-contact-desc').innerText = t.contactDesc;
         document.getElementById('t-send').innerText = t.send;
         document.getElementById('searchInput').placeholder = t.ph;
         document.getElementById('t-msg-ph').placeholder = t.msg;
@@ -281,13 +300,9 @@
     function performSearch() {
         const inputVal = document.getElementById('searchInput').value.trim();
         if (!inputVal) return;
-
         const yF = parseInt(document.getElementById('yearFrom').value) || 0;
         const yT = parseInt(document.getElementById('yearTo').value) || 2050;
-        
-        // Если в строке есть латиница - транслитерируем, если нет - берем как есть
         const query = /[a-zA-Z]/.test(inputVal) ? autoTranslit(inputVal) : inputVal.toLowerCase();
-
         const results = allData.filter(r => {
             const rowName = r[1].toLowerCase();
             const nameMatch = rowName.includes(query);
@@ -295,7 +310,6 @@
             const d = parseInt(r[3]) || 2050;
             return nameMatch && (b >= yF || yF === 0) && (d <= yT);
         });
-
         if(results.length) renderResults(results);
         else alert(translations[currentLang].alert);
     }
