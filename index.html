@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Реестр захоронений | Кишиневское Еврейское Кладбище</title>
+    <title>Кишиневское Еврейское Кладбище | Реестр BSearch</title>
+    
     <style>
         :root {
             --brand-color: #1e3a8a;
@@ -15,123 +16,152 @@
 
         body { 
             margin: 0; padding: 0; background: var(--bg-main); 
-            color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            color: var(--text-main); font-family: "Inter", -apple-system, sans-serif; 
             line-height: 1.6;
         }
 
         .hero-section {
-            background: var(--brand-color); color: white;
-            padding: 40px 20px; text-align: center;
+            position: relative; background: var(--brand-color); color: white;
+            padding: 60px 20px; text-align: center;
         }
+        .hero-bg {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('https://images.unsplash.com/photo-1590059392135-cc04192667d4?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover; background-position: center; opacity: 0.15; z-index: 1;
+        }
+        .hero-content { position: relative; z-index: 2; }
+        .hero-content h1 { font-size: 2.2rem; margin: 0 0 10px; font-weight: 700; }
 
-        .container { max-width: 1000px; margin: -30px auto 40px; padding: 0 20px; }
+        .container { max-width: 1000px; margin: -40px auto 40px; padding: 0 20px; position: relative; z-index: 3; }
 
         .search-card {
-            background: white; padding: 25px; border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border: 1px solid var(--border);
+            background: white; padding: 30px; border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid var(--border);
         }
-
         .search-group { display: flex; gap: 10px; margin-top: 15px; }
-
         input { 
-            flex: 1; padding: 14px; border: 1px solid var(--border); 
-            border-radius: 8px; font-size: 16px; outline: none; width: 100%;
+            flex: 1; padding: 16px; border: 1px solid var(--border); 
+            border-radius: 8px; font-size: 16px; outline: none; width: 100%; box-sizing: border-box;
         }
 
         .btn-main { 
             background: var(--brand-color); color: white; border: none;
-            padding: 14px 25px; border-radius: 8px; font-weight: bold; cursor: pointer;
+            padding: 16px 30px; border-radius: 8px; font-weight: 700; cursor: pointer;
         }
-
         .btn-main:disabled { background: #9ca3af; }
 
         .results-wrapper { margin-top: 30px; }
-
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-        th { background: #f9fafb; padding: 12px; text-align: left; font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 2px solid var(--border); cursor: pointer; }
-        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        th { background: #f9fafb; padding: 16px; text-align: left; font-size: 12px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border); cursor: pointer; }
+        td { padding: 16px; border-bottom: 1px solid var(--border); }
 
-        .highlight { background: #ffeb3b; font-weight: bold; padding: 0 2px; }
+        .map-box { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; padding: 10px; margin-top: 30px; }
+        .contact-box { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 30px; margin: 30px 0; }
+        
+        .highlight { background: #BADCF8; color: #000; font-weight: 700; padding: 0 2px; }
+        .footer { padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 14px; border-top: 1px solid var(--border); background: white; }
 
         @media (max-width: 768px) {
             .search-group { flex-direction: column; }
             table thead { display: none; }
-            tr { display: block; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
-            td { display: flex; justify-content: space-between; text-align: right; padding: 8px 0; border: none; }
-            td::before { content: attr(data-label); font-weight: bold; text-align: left; color: var(--text-muted); font-size: 12px; }
+            tr { display: block; background: white; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border); padding: 15px; }
+            td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+            td::before { content: attr(data-label); font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 800; }
         }
     </style>
 </head>
 <body>
 
 <header class="hero-section">
-    <h1>Кишиневское Еврейское Кладбище</h1>
-    <p>Электронный реестр памяти</p>
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+        <h1>Кишиневское Еврейское Кладбище</h1>
+        <p>Электронный реестр памяти</p>
+    </div>
 </header>
 
 <div class="container">
-    <div class="search-card">
-        <div id="status" style="font-size: 13px; color: var(--text-muted);">Загрузка базы данных...</div>
+    <div class="search-card" id="searchArea">
+        <h2 id="status" style="font-size: 14px; color: var(--text-muted); margin: 0;">Загрузка данных...</h2>
         <div class="search-group">
-            <input type="text" id="searchInput" placeholder="Введите фамилию для поиска..." disabled>
-            <button class="btn-main" id="searchBtn" onclick="performSearch()" disabled>ПОИСК</button>
+            <input type="text" id="searchInput" placeholder="Введите фамилию..." disabled>
+            <button class="btn-main" id="searchBtn" onclick="performSearch()" disabled>НАЙТИ</button>
         </div>
     </div>
 
     <div class="results-wrapper">
-        <button onclick="resetUI()" id="backBtn" style="display:none; margin-bottom: 15px; padding: 8px 15px; cursor:pointer;">← Назад к поиску</button>
+        <button onclick="resetUI()" id="backBtn" style="display:none; margin-bottom: 20px; padding: 12px 24px; cursor:pointer; font-weight:bold; border-radius:8px; border:1px solid var(--border); background: white;">← Новый поиск</button>
         
         <table id="resultsTable" style="display: none;">
             <thead>
                 <tr>
-                    <th onclick="sortData(0)">ФИО</th>
-                    <th onclick="sortData(1)">Рождение</th>
-                    <th onclick="sortData(2)">Смерть</th>
-                    <th onclick="sortData(3)">Сектор</th>
+                    <th onclick="sortData(1)">ФИО</th>
+                    <th onclick="sortData(2)">Рождение</th>
+                    <th onclick="sortData(3)">Смерть</th>
+                    <th onclick="sortData(5)">Сектор</th>
                     <th onclick="sortData(4)">№ Могилы</th>
                 </tr>
             </thead>
             <tbody id="resultsBody"></tbody>
         </table>
     </div>
+
+    <section class="map-box">
+        <h3 style="padding: 10px 15px; margin: 0; color: var(--brand-color); font-size: 1.1rem;">Интерактивная карта</h3>
+        <iframe width="100%" height="400" frameborder="0" src="https://www.openstreetmap.org/export/embed.html?bbox=28.7900,47.0320,28.8050,47.0390&layer=mapnik&marker=47.0356,28.7970"></iframe>
+    </section>
+
+    <section class="contact-box">
+        <h3>Обратная связь</h3>
+        <form action="https://formspree.io/f/xvzbwgzp" method="POST" style="display: grid; gap: 15px;">
+            <input type="email" name="email" placeholder="Ваш Email" required style="padding: 12px; border: 1px solid var(--border); border-radius: 8px;">
+            <textarea name="message" rows="4" placeholder="Ваше сообщение..." required style="padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit;"></textarea>
+            <button type="submit" class="btn-main">ОТПРАВИТЬ</button>
+        </form>
+    </section>
 </div>
+
+<footer class="footer">
+    © 2026 BSearch | Общественный реестр памяти
+</footer>
 
 <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPQWudyymuRTEaC9_FQYCyZFSoAp2P30Me_Th6dWDMHckiD6BnT3fQ9cfR4UreAlmxrujIb5aqKlJ/pub?gid=726531709&single=true&output=csv';
 
     let allData = [];
-    let filteredData = [];
+    let filteredResults = [];
 
-    // Функция для корректного разделения CSV строки с учетом кавычек
-    function parseCSVLine(text) {
-        const result = [];
-        let cur = '';
-        let inQuote = false;
-        for (let char of text) {
-            if (char === '"') inQuote = !inQuote;
-            else if (char === ',' && !inQuote) {
-                result.push(cur.trim());
-                cur = '';
-            } else cur += char;
-        }
-        result.push(cur.trim());
-        return result;
+    // Надежный парсинг CSV
+    function parseCSV(text) {
+        const lines = text.split(/\r?\n/);
+        return lines.map(line => {
+            const cells = [];
+            let cur = '';
+            let inQuote = false;
+            for (let char of line) {
+                if (char === '"') inQuote = !inQuote;
+                else if (char === ',' && !inQuote) {
+                    cells.push(cur.trim());
+                    cur = '';
+                } else cur += char;
+            }
+            cells.push(cur.trim());
+            return cells;
+        }).filter(row => row.length > 1 && row[1] !== "" && row[1] !== "full_name");
     }
 
     async function init() {
         try {
             const response = await fetch(CSV_URL);
             const text = await response.text();
-            const lines = text.split('\n').filter(l => l.trim() !== '');
+            allData = parseCSV(text);
             
-            // Записываем данные (пропуская заголовок)
-            allData = lines.slice(1).map(line => parseCSVLine(line));
-
-            document.getElementById('status').innerText = `База данных готова. Записей: ${allData.length}`;
+            document.getElementById('status').innerText = `База готова. Записей: ${allData.length}`;
             document.getElementById('searchInput').disabled = false;
             document.getElementById('searchBtn').disabled = false;
         } catch (e) {
-            document.getElementById('status').innerText = 'Ошибка доступа к данным. Проверьте публикацию таблицы.';
+            document.getElementById('status').innerText = 'Ошибка загрузки данных.';
+            console.error(e);
         }
     }
 
@@ -139,18 +169,20 @@
         const query = document.getElementById('searchInput').value.trim().toLowerCase();
         if (!query) return;
 
-        filteredData = allData.filter(row => 
-            row[0] && row[0].toLowerCase().includes(query)
+        // Поиск по второму столбцу (индекс 1 - full_name)
+        filteredResults = allData.filter(row => 
+            row[1] && row[1].toLowerCase().includes(query)
         );
 
-        if (filteredData.length === 0) {
+        if (filteredResults.length === 0) {
             alert('Ничего не найдено');
             return;
         }
 
-        render(filteredData, query);
+        render(filteredResults, query);
         document.getElementById('resultsTable').style.display = 'table';
         document.getElementById('backBtn').style.display = 'block';
+        document.getElementById('searchArea').style.display = 'none';
     }
 
     function render(data, highlight = '') {
@@ -159,19 +191,28 @@
 
         data.forEach(row => {
             const tr = document.createElement('tr');
-            const labels = ['ФИО', 'Рождение', 'Смерть', 'Сектор', '№ Могилы'];
             
-            row.forEach((cell, index) => {
-                if (index > 4) return; // Ограничиваем количество колонок
+            // Сопоставляем индексы из CSV с ячейками таблицы:
+            // 1: full_name, 2: birth_date, 3: death_date, 5: sector, 4: grave_number
+            const config = [
+                { idx: 1, label: 'ФИО' },
+                { idx: 2, label: 'Рождение' },
+                { idx: 3, label: 'Смерть' },
+                { idx: 5, label: 'Сектор' },
+                { idx: 4, label: '№ Могилы' }
+            ];
+
+            config.forEach(item => {
                 const td = document.createElement('td');
-                td.setAttribute('data-label', labels[index]);
+                td.setAttribute('data-label', item.label);
+                let val = row[item.idx] || '-';
                 
-                let content = cell || '-';
-                if (index === 0 && highlight) {
-                    const regex = new RegExp(`(${highlight})`, 'gi');
-                    content = content.replace(regex, '<span class="highlight">$1</span>');
+                if (item.idx === 1 && highlight) {
+                    const reg = new RegExp(`(${highlight})`, 'gi');
+                    val = val.replace(reg, '<span class="highlight">$1</span>');
                 }
-                td.innerHTML = content;
+                
+                td.innerHTML = val;
                 tr.appendChild(td);
             });
             tbody.appendChild(tr);
@@ -181,17 +222,18 @@
     function resetUI() {
         document.getElementById('resultsTable').style.display = 'none';
         document.getElementById('backBtn').style.display = 'none';
+        document.getElementById('searchArea').style.display = 'block';
         document.getElementById('searchInput').value = '';
     }
 
     function sortData(idx) {
-        filteredData.sort((a, b) => (a[idx] || '').localeCompare(b[idx] || '', 'ru'));
-        render(filteredData, document.getElementById('searchInput').value);
+        filteredResults.sort((a, b) => (a[idx] || '').localeCompare(b[idx] || '', 'ru'));
+        render(filteredResults, document.getElementById('searchInput').value);
     }
 
     document.getElementById('searchInput').onkeypress = e => { if(e.key === 'Enter') performSearch(); };
-    
     window.onload = init;
 </script>
+
 </body>
 </html>
