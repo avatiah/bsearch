@@ -37,7 +37,7 @@
         .search-hint { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; }
         
         .search-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        input { flex: 1; padding: 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; outline: none; }
+        input { flex: 1; padding: 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; outline: none; width: 100%; box-sizing: border-box;}
 
         .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .btn-text { background: none; border: none; color: var(--brand-color); cursor: pointer; font-size: 13px; font-weight: 600; }
@@ -157,10 +157,23 @@
     let favorites = JSON.parse(localStorage.getItem('bsearch_favs') || '[]');
     let currentLang = 'ru';
 
+    // Карта транслитерации
+    const translitMap = {"a":"а","b":"б","v":"в","g":"г","d":"д","e":"е","yo":"ё","zh":"ж","z":"з","i":"и","j":"й","k":"к","l":"л","m":"м","n":"н","o":"о","p":"п","r":"р","s":"с","t":"т","u":"у","f":"ф","h":"х","ts":"ц","ch":"ч","sh":"ш","shch":"щ","y":"ы","yu":"ю","ya":"я","ai":"ай","ei":"ей"};
+
+    function autoTranslit(text) {
+        let output = text.toLowerCase();
+        const complex = ["shch","yo","zh","ts","ch","sh","yu","ya","ai","ei"];
+        complex.forEach(c => {
+            const reg = new RegExp(c, "g");
+            output = output.replace(reg, translitMap[c]);
+        });
+        return output.split('').map(char => translitMap[char] || char).join('');
+    }
+
     const translations = {
-        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Электронный реестр памяти", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", colFio: "ФИО", colB: "Рождение", colD: "Смерть", colS: "Сектор", colN: "№ Могилы", loading: "Введите фамилию для поиска. Можно латиницей.", map: "Схема кладбища", contact: "Обратная связь", hint: "Сообщите нам о неточностях.", send: "ОТПРАВИТЬ" },
-        en: { title: "Kishinev Jewish Cemetery", subtitle: "Memorial Registry", search: "SEARCH", filter: "⚙ Year Filter", fav: "⭐ Favorites", back: "← Back", colFio: "Full Name", colB: "Birth", colD: "Death", colS: "Sector", colN: "Grave #", loading: "Enter name to search (Latin or Cyrillic)", map: "Cemetery Map", contact: "Contact Us", hint: "Report errors or additions.", send: "SEND" },
-        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר זיכרון אלקטרוני", search: "חיפוש", filter: "⚙ פילטר שנים", fav: "⭐ מועדפים", back: "← חזור", colFio: "שם מלא", colB: "לידה", colD: "פטירה", colS: "חלקה", colN: "קבר מס'", loading: "הזינו שם לחיפוש", map: "מפת בית העלמין", contact: "צור קשר", hint: "דווח על טעויות או הוסף מידע", send: "שלח" }
+        ru: { title: "Кишиневское Еврейское Кладбище", subtitle: "Электронный реестр памяти", search: "ПОИСК", filter: "⚙ Годы жизни", fav: "⭐ Избранное", back: "← Назад", colFio: "ФИО", colB: "Рождение", colD: "Смерть", colS: "Сектор", colN: "№ Могилы", loading: "Реестр готов. Поиск на любом языке.", map: "Схема кладбища", contact: "Обратная связь", hint: "Сообщите нам о неточностях.", send: "ОТПРАВИТЬ" },
+        en: { title: "Kishinev Jewish Cemetery", subtitle: "Memorial Registry", search: "SEARCH", filter: "⚙ Year Filter", fav: "⭐ Favorites", back: "← Back", colFio: "Full Name", colB: "Birth", colD: "Death", colS: "Sector", colN: "Grave #", loading: "Database ready. Multilingual search.", map: "Cemetery Map", contact: "Contact Us", hint: "Report errors or additions.", send: "SEND" },
+        he: { title: "בית העלמין היהודי בקישינב", subtitle: "מאגר זיכרון אלקטרוני", search: "חיפוש", filter: "⚙ פילטר שנים", fav: "⭐ מועדפים", back: "← חזור", colFio: "שם מלא", colB: "לידה", colD: "פטירה", colS: "חלקה", colN: "קבר מס'", loading: "הנתונים מוכנים לחיפוש", map: "מפת בית העלמין", contact: "צור קשר", hint: "דווח על טעויות או הוסף מידע", send: "שלח" }
     };
 
     function setLang(lang) {
@@ -198,14 +211,25 @@
     }
 
     function performSearch() {
-        const q = document.getElementById('searchInput').value.trim().toLowerCase();
+        const inputVal = document.getElementById('searchInput').value.trim().toLowerCase();
+        if(!inputVal) return;
+
+        // Если в запросе есть латиница - транслитерируем
+        const query = /[a-z]/.test(inputVal) ? autoTranslit(inputVal) : inputVal;
+        
         const yF = parseInt(document.getElementById('yearFrom').value) || 0;
         const yT = parseInt(document.getElementById('yearTo').value) || 2100;
-        if(!q) return;
 
-        currentView = allData.filter(r => r[1].toLowerCase().includes(q) && (parseInt(r[2]) >= yF || yF === 0) && (parseInt(r[3]) <= yT));
+        currentView = allData.filter(r => {
+            const nameMatch = r[1] && r[1].toLowerCase().includes(query);
+            const birthYear = parseInt(r[2]) || 0;
+            const deathYear = parseInt(r[3]) || 2100;
+            const yearMatch = (birthYear >= yF || yF === 0) && (deathYear <= yT);
+            return nameMatch && yearMatch;
+        });
+
         if (currentView.length === 0) return alert("Ничего не найдено");
-        render(currentView, q);
+        render(currentView, query);
     }
 
     function render(data, highlight = '') {
@@ -232,21 +256,18 @@
 
     function exportToPDF() {
         const element = document.getElementById('pdf-content');
-        
-        // Временно скрываем колонку со звездочками для PDF
         const stars = document.querySelectorAll('.no-pdf');
         stars.forEach(s => s.style.display = 'none');
 
         const opt = {
             margin: 10,
-            filename: 'Kishinev_Cemetery_Registry.pdf',
+            filename: 'BSearch_Registry.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
         html2pdf().set(opt).from(element).save().then(() => {
-            // Возвращаем звездочки обратно после скачивания
             stars.forEach(s => s.style.display = '');
         });
     }
